@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Next Technologies — Infraestrutura de Pagamentos Digitais</title>
+<meta name="description" content="Next Technologies: infraestrutura de pagamentos digitais com alta aprovação, split automático, antecipação de recebíveis e segurança de nível bancário para e-commerces, infoprodutos e marketplaces.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230B1229%22/><path d=%22M28 70V30h9l26 27V30h9v40h-9L37 43v27z%22 fill=%22%2300E0C6%22/></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Sprite de ícones — todos os ícones do site referenciam estes símbolos via <use> -->
+<svg class="icon-sprite" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="icon-lock" viewBox="0 0 24 24"><path d="M6 11V8a6 6 0 0 1 12 0v3"/><rect x="4" y="11" width="16" height="10" rx="2"/></symbol>
+    <symbol id="icon-shield-check" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="icon-card" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></symbol>
+    <symbol id="icon-activity" viewBox="0 0 24 24"><path d="M3 12h4l2 7 4-14 2 7h6"/></symbol>
+    <symbol id="icon-repeat" viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
+    <symbol id="icon-trending-up" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></symbol>
+    <symbol id="icon-branch" viewBox="0 0 24 24"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 21a2 2 0 0 0 4 0"/></symbol>
+    <symbol id="icon-receipt" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3z"/><path d="M9 8h6"/><path d="M9 12h6"/></symbol>
+    <symbol id="icon-bar-chart" viewBox="0 0 24 24"><path d="M4 20V10"/><path d="M12 20V4"/><path d="M20 20v-7"/></symbol>
+    <symbol id="icon-headset" viewBox="0 0 24 24"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="2" y="13" width="5" height="7" rx="2"/><rect x="17" y="13" width="5" height="7" rx="2"/><path d="M20 20a4 4 0 0 1-4 3h-2"/></symbol>
+    <symbol id="icon-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.4 12.4a2 2 0 0 0 2 1.6h8.6a2 2 0 0 0 2-1.6L22 7H6"/></symbol>
+    <symbol id="icon-cap" viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5-10-5z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></symbol>
+    <symbol id="icon-store" viewBox="0 0 24 24"><path d="M3 9l1-5h16l1 5"/><path d="M4 9v10h16V9"/><path d="M9 19v-6h6v6"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></symbol>
+    <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></symbol>
+    <symbol id="icon-bulb" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.3 1 2.5h6c0-1.2.4-1.9 1-2.5A6 6 0 0 0 12 3z"/></symbol>
+  </defs>
+</svg>
+
+<div class="bg-fx" aria-hidden="true"></div>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header" id="header">
+  <div class="container header-inner">
+    <a href="#top" class="logo" aria-label="Next Technologies — página inicial">
+      <svg width="34" height="34" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100" height="100" rx="22" fill="url(#logoGrad)"/>
+        <path d="M28 70V30h9l26 27V30h9v40h-9L37 43v27z" fill="#061024"/>
+        <defs>
+          <linearGradient id="logoGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#00E0C6"/>
+            <stop offset="1" stop-color="#2F6BFF"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span class="logo-word">NEXT <b>TECHNOLOGIES</b></span>
+    </a>
+
+    <nav class="main-nav" id="mainNav">
+      <a href="#solucoes">Soluções</a>
+      <a href="#recursos">Recursos</a>
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#seguranca">Segurança</a>
+      <a href="#planos">Planos</a>
+      <a href="#faq">FAQ</a>
+      <div class="mobile-only-actions">
+        <a href="/login.html" class="btn btn-ghost">Entrar</a>
+        <a href="#cta" class="btn btn-primary">Fale com um especialista</a>
+      </div>
+    </nav>
+
+    <div class="header-actions">
+      <a href="/login.html" class="btn btn-ghost">Entrar</a>
+      <a href="#cta" class="btn btn-primary">Fale com um especialista</a>
+    </div>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy" data-reveal>
+        <span class="eyebrow"><span class="dot"></span> Infraestrutura de pagamentos digitais</span>
+        <h1>A solução de pagamentos que faz o seu negócio <span class="grad-text">vender mais e receber mais rápido</span>.</h1>
+        <p class="hero-sub">A Next Technologies conecta e-commerces, infoprodutores e marketplaces a um motor de pagamentos com roteamento multiadquirente, split automático e antecipação — tudo com segurança de nível bancário.</p>
+        <div class="hero-cta">
+          <a href="#cta" class="btn btn-primary btn-lg">Começar agora</a>
+          <a href="#como-funciona" class="btn btn-outline btn-lg">Ver como funciona</a>
+        </div>
+        <div class="hero-trust">
+          <div><strong>+98%</strong><span>uptime da infraestrutura</span></div>
+          <div><strong>Pix D+0</strong><span>recebimento na hora</span></div>
+          <div><strong>D+2</strong><span>antecipação de recebíveis</span></div>
+          <div><strong>PCI DSS</strong><span>segurança certificada</span></div>
+        </div>
+      </div>
+
+      <div class="hero-visual" data-reveal>
+        <div class="panel-card">
+          <div class="panel-head">
+            <span class="panel-dot red"></span><span class="panel-dot yellow"></span><span class="panel-dot green"></span>
+            <span class="panel-title">Painel Next Technologies</span>
+          </div>
+          <div class="panel-stats">
+            <div class="stat-box">
+              <span class="stat-label">Volume processado (30d)</span>
+              <span class="stat-value">R$ 1.284.930</span>
+              <span class="stat-up"><svg class="icon"><use href="#icon-trending-up"></use></svg>18,4%</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Taxa de aprovação</span>
+              <span class="stat-value">96,7%</span>
+              <span class="stat-up"><svg class="icon"><use href="#icon-trending-up"></use></svg>3,1%</span>
+            </div>
+          </div>
+          <div class="panel-chart" aria-hidden="true">
+            <svg viewBox="0 0 300 90" preserveAspectRatio="none">
+              <polyline points="0,70 30,60 60,65 90,45 120,50 150,30 180,35 210,20 240,25 270,10 300,15" fill="none" stroke="url(#chartGrad)" stroke-width="3"/>
+              <defs>
+                <linearGradient id="chartGrad" x1="0" y1="0" x2="300" y2="0">
+                  <stop stop-color="#00E0C6"/>
+                  <stop offset="1" stop-color="#2F6BFF"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="panel-tx">
+            <div class="tx-row">
+              <span class="tx-icon ok"><svg class="icon"><use href="#icon-check"></use></svg></span>
+              <div class="tx-info"><strong>Pix aprovado</strong><small>Cliente ****2841 · agora</small></div>
+              <span class="tx-amount">+ R$ 349,90</span>
+            </div>
+            <div class="tx-row">
+              <span class="tx-icon ok"><svg class="icon"><use href="#icon-check"></use></svg></span>
+              <div class="tx-info"><strong>Cartão aprovado · 3x</strong><small>Cliente ****7710 · há 2 min</small></div>
+              <span class="tx-amount">+ R$ 897,00</span>
+            </div>
+          </div>
+        </div>
+        <div class="badge-float badge-1"><span class="badge-icon"><svg class="icon"><use href="#icon-lock"></use></svg></span><span>Criptografia ponta a ponta</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SEGMENTOS ============ -->
+  <section class="section" id="solucoes">
+    <div class="container">
+      <h2 class="section-title" data-reveal>Feito sob medida para o seu modelo de negócio</h2>
+      <p class="section-sub" data-reveal>Cada mercado tem desafios diferentes de pagamento. A gente resolve o seu.</p>
+
+      <div class="grid-3">
+        <article class="seg-card" data-reveal>
+          <div class="seg-icon"><svg class="icon"><use href="#icon-cart"></use></svg></div>
+          <h3>E-commerce</h3>
+          <p>Checkout otimizado, antifraude inteligente e roteamento multiadquirente para aumentar a aprovação em cada venda.</p>
+          <ul class="seg-list">
+            <li>Checkout transparente</li>
+            <li>Recuperação de vendas</li>
+            <li>Split para fornecedores</li>
+          </ul>
+        </article>
+
+        <article class="seg-card" data-reveal>
+          <div class="seg-icon"><svg class="icon"><use href="#icon-cap"></use></svg></div>
+          <h3>Infoprodutos &amp; Assinaturas</h3>
+          <p>Cobranças recorrentes sem fricção, gestão de inadimplência e split automático para afiliados e coprodutores.</p>
+          <ul class="seg-list">
+            <li>Recorrência inteligente</li>
+            <li>Split de afiliados</li>
+            <li>Antecipação de recebíveis</li>
+          </ul>
+        </article>
+
+        <article class="seg-card" data-reveal>
+          <div class="seg-icon"><svg class="icon"><use href="#icon-store"></use></svg></div>
+          <h3>Marketplaces</h3>
+          <p>Repasses automáticos para múltiplos vendedores, conciliação simplificada e conformidade regulatória embutida.</p>
+          <ul class="seg-list">
+            <li>Split multi-vendedor</li>
+            <li>Conciliação automática</li>
+            <li>Onboarding de sellers</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROBLEMAS -> SOLUÇÕES ============ -->
+  <section class="section section-alt">
+    <div class="container">
+      <h2 class="section-title" data-reveal>Os 3 problemas que mais travam o seu faturamento</h2>
+      <p class="section-sub" data-reveal>E como a Next Technologies resolve cada um deles.</p>
+
+      <div class="grid-3">
+        <article class="problem-card" data-reveal>
+          <span class="problem-tag"><svg class="icon"><use href="#icon-alert"></use></svg>Problema</span>
+          <h3>Aprovação baixa</h3>
+          <p>Vendas recusadas sem motivo aparente, perdendo receita todos os dias.</p>
+          <div class="problem-solution">
+            <span class="sol-tag"><svg class="icon"><use href="#icon-bulb"></use></svg>Solução</span>
+            <p>Roteamento inteligente entre múltiplas adquirentes escolhe sempre a rota com maior chance de aprovação.</p>
+          </div>
+        </article>
+
+        <article class="problem-card" data-reveal>
+          <span class="problem-tag"><svg class="icon"><use href="#icon-alert"></use></svg>Problema</span>
+          <h3>Dinheiro travado</h3>
+          <p>Recebíveis presos por dias, comprometendo caixa e capital de giro.</p>
+          <div class="problem-solution">
+            <span class="sol-tag"><svg class="icon"><use href="#icon-bulb"></use></svg>Solução</span>
+            <p>Pix cai na hora (D+0) e a antecipação de outros recebíveis sai com taxas transparentes, dinheiro na conta em até D+2.</p>
+          </div>
+        </article>
+
+        <article class="problem-card" data-reveal>
+          <span class="problem-tag"><svg class="icon"><use href="#icon-alert"></use></svg>Problema</span>
+          <h3>Integração complicada</h3>
+          <p>Times técnicos perdendo semanas para integrar meios de pagamento.</p>
+          <div class="problem-solution">
+            <span class="sol-tag"><svg class="icon"><use href="#icon-bulb"></use></svg>Solução</span>
+            <p>API única, documentação clara, webhooks em tempo real e suporte técnico dedicado na implantação.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMO FUNCIONA ============ -->
+  <section class="section" id="como-funciona">
+    <div class="container">
+      <h2 class="section-title" data-reveal>Como funciona</h2>
+      <p class="section-sub" data-reveal>Do cadastro ao primeiro pagamento recebido, em poucos passos.</p>
+
+      <div class="steps">
+        <div class="step" data-reveal>
+          <div class="step-num">01</div>
+          <h3>Cadastro</h3>
+          <p>Crie sua conta e envie os documentos da empresa em poucos minutos.</p>
+        </div>
+        <div class="step" data-reveal>
+          <div class="step-num">02</div>
+          <h3>Integração</h3>
+          <p>Conecte via API, plugin ou link de pagamento — sem precisar de um time grande de dev.</p>
+        </div>
+        <div class="step" data-reveal>
+          <div class="step-num">03</div>
+          <h3>Recebimento</h3>
+          <p>Comece a receber com Pix, cartão e boleto, com split automático configurado.</p>
+        </div>
+        <div class="step" data-reveal>
+          <div class="step-num">04</div>
+          <h3>Gestão</h3>
+          <p>Acompanhe tudo em tempo real no painel: vendas, antecipação e conciliação.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURES ============ -->
+  <section class="section section-alt" id="recursos">
+    <div class="container">
+      <h2 class="section-title" data-reveal>Tudo o que você precisa em uma única infraestrutura</h2>
+      <p class="section-sub" data-reveal>Recursos pensados para negócios que não podem parar de vender.</p>
+
+      <div class="grid-4">
+        <div class="feat-card" data-reveal><span class="feat-icon"><svg class="icon"><use href="#icon-repeat"></use></svg></span><h3>Roteamento multiadquirente</h3><p>Maximiza a aprovação escolhendo a melhor rota em tempo real.</p></div>
+        <div class="feat-card" data-reveal><span class="feat-icon"><svg class="icon"><use href="#icon-trending-up"></use></svg></span><h3>Antecipação de recebíveis</h3><p>Transforme vendas futuras em caixa disponível quando precisar.</p></div>
+        <div class="feat-card" data-reveal><span class="feat-icon"><svg class="icon"><use href="#icon-branch"></use></svg></span><h3>Split automático</h3><p>Divida pagamentos entre sócios, afiliados e fornecedores sem esforço manual.</p></div>
+        <div class="feat-card" data-reveal><span class="feat-icon"><svg class="icon"><use href="#icon-shield-check"></use></svg></span><h3>Segurança PCI DSS</h3><p>Dados sensíveis tokenizados e protegidos em conformidade com o padrão global.</p></div>
+        <div class="feat-card" data-reveal><span class="feat-icon"><svg class="icon"><use href="#icon-bell"></use></svg></span><h3>Webhooks em tempo real</h3><p>Receba eventos de pagamento instantaneamente no seu sistema.</p></div>
+        <div class="feat-card" data-reveal><span class="feat-icon"><svg class="icon"><use href="#icon-receipt"></use></svg></span><h3>Checkout transparente</h3><p>Experiência de pagamento fluida, sem redirecionamentos que derrubam conversão.</p></div>
+        <div class="feat-card" data-reveal><span class="feat-icon"><svg class="icon"><use href="#icon-bar-chart"></use></svg></span><h3>Dashboard completo</h3><p>Visão de vendas, taxas e recebíveis em um painel único e intuitivo.</p></div>
+        <div class="feat-card" data-reveal><span class="feat-icon"><svg class="icon"><use href="#icon-headset"></use></svg></span><h3>Suporte dedicado</h3><p>Time especializado para acompanhar sua operação do onboarding ao dia a dia.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SEGURANÇA ============ -->
+  <section class="section security" id="seguranca">
+    <div class="container security-grid">
+      <div data-reveal>
+        <span class="eyebrow eyebrow-alt"><span class="dot"></span> Segurança em primeiro lugar</span>
+        <h2 class="section-title left">Proteção de nível bancário em cada transação</h2>
+        <p class="section-sub left">A Next Technologies foi construída sobre uma base de segurança rígida, para que você foque em vender e seus clientes tenham total confiança em pagar.</p>
+
+        <div class="security-list">
+          <div class="security-item">
+            <span class="sec-icon"><svg class="icon"><use href="#icon-lock"></use></svg></span>
+            <div><strong>Criptografia ponta a ponta</strong><p>Todos os dados são criptografados em trânsito e em repouso.</p></div>
+          </div>
+          <div class="security-item">
+            <span class="sec-icon"><svg class="icon"><use href="#icon-shield-check"></use></svg></span>
+            <div><strong>Conformidade PCI DSS</strong><p>Ambiente de pagamento auditado conforme o padrão internacional.</p></div>
+          </div>
+          <div class="security-item">
+            <span class="sec-icon"><svg class="icon"><use href="#icon-card"></use></svg></span>
+            <div><strong>Tokenização de cartões</strong><p>Nenhum dado sensível de cartão trafega ou é armazenado sem tokenização.</p></div>
+          </div>
+          <div class="security-item">
+            <span class="sec-icon"><svg class="icon"><use href="#icon-activity"></use></svg></span>
+            <div><strong>Antifraude com IA</strong><p>Modelos de risco analisam cada transação em milissegundos.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="security-visual" data-reveal>
+        <div class="shield-card">
+          <svg width="120" height="120" viewBox="0 0 100 100" fill="none">
+            <path d="M50 5 L90 20 V48 C90 72 72 88 50 95 C28 88 10 72 10 48 V20 Z" fill="url(#shieldGrad)" opacity="0.15"/>
+            <path d="M50 5 L90 20 V48 C90 72 72 88 50 95 C28 88 10 72 10 48 V20 Z" stroke="url(#shieldGrad)" stroke-width="2.5" fill="none"/>
+            <path d="M35 50 L46 61 L67 38" stroke="#00E0C6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <defs>
+              <linearGradient id="shieldGrad" x1="10" y1="5" x2="90" y2="95">
+                <stop stop-color="#00E0C6"/>
+                <stop offset="1" stop-color="#2F6BFF"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <strong>Ambiente 100% seguro</strong>
+          <span>Monitoramento contínuo 24/7</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PLANOS ============ -->
+  <section class="section" id="planos">
+    <div class="container">
+      <h2 class="section-title" data-reveal>Planos que crescem com o seu negócio</h2>
+      <p class="section-sub" data-reveal>Sem taxas escondidas. Sem letras miúdas.</p>
+
+      <div class="grid-3 pricing">
+        <article class="price-card" data-reveal>
+          <h3>Essencial</h3>
+          <p class="price-desc">Para quem está começando a vender online.</p>
+          <div class="price-value"><span>1,79%</span> por Pix</div>
+          <div class="price-value alt"><span>5,3%</span> por cartão</div>
+          <ul class="price-list">
+            <li><svg class="icon"><use href="#icon-check"></use></svg>Checkout transparente</li>
+            <li><svg class="icon"><use href="#icon-check"></use></svg>Dashboard completo</li>
+            <li><svg class="icon"><use href="#icon-check"></use></svg>Suporte por chat</li>
+          </ul>
+          <a href="#cta" class="btn btn-outline btn-block">Escolher Essencial</a>
+        </article>
+
+        <article class="price-card featured" data-reveal>
+          <span class="price-badge">Mais popular</span>
+          <h3>Pro</h3>
+          <p class="price-desc">Para negócios em crescimento acelerado.</p>
+          <div class="price-value"><span>1,5%</span> por Pix</div>
+          <div class="price-value alt"><span>4,7%</span> por cartão</div>
+          <ul class="price-list">
+            <li><svg class="icon"><use href="#icon-check"></use></svg>Tudo do Essencial</li>
+            <li><svg class="icon"><use href="#icon-check"></use></svg>Antecipação de recebíveis</li>
+            <li><svg class="icon"><use href="#icon-check"></use></svg>Split automático</li>
+            <li><svg class="icon"><use href="#icon-check"></use></svg>Gerente de conta</li>
+          </ul>
+          <a href="#cta" class="btn btn-primary btn-block">Escolher Pro</a>
+        </article>
+
+        <article class="price-card" data-reveal>
+          <h3>Corporativo</h3>
+          <p class="price-desc">Para alto volume e operações complexas.</p>
+          <div class="price-value"><span>Sob medida</span></div>
+          <ul class="price-list">
+            <li><svg class="icon"><use href="#icon-check"></use></svg>Tudo do Pro</li>
+            <li><svg class="icon"><use href="#icon-check"></use></svg>Split multi-vendedor</li>
+            <li><svg class="icon"><use href="#icon-check"></use></svg>SLA dedicado</li>
+            <li><svg class="icon"><use href="#icon-check"></use></svg>Integração assistida</li>
+          </ul>
+          <a href="#cta" class="btn btn-outline btn-block">Falar com vendas</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESULTADOS ============ -->
+  <section class="section section-alt">
+    <div class="container">
+      <h2 class="section-title" data-reveal>O que você ganha com a Next Technologies</h2>
+      <p class="section-sub" data-reveal>Resultados que a nossa infraestrutura de pagamentos foi desenhada para entregar.</p>
+
+      <div class="grid-3">
+        <article class="seg-card" data-reveal>
+          <div class="seg-icon"><svg class="icon"><use href="#icon-trending-up"></use></svg></div>
+          <h3>Mais aprovação</h3>
+          <p>Roteamento multiadquirente escolhe sempre a rota com maior chance de aprovar a venda, recuperando receita que hoje é perdida.</p>
+        </article>
+        <article class="seg-card" data-reveal>
+          <div class="seg-icon"><svg class="icon"><use href="#icon-lock"></use></svg></div>
+          <h3>Caixa liberado mais rápido</h3>
+          <p>Pix cai na hora e a antecipação dos demais recebíveis sai em até D+2, sem depender de negociação manual.</p>
+        </article>
+        <article class="seg-card" data-reveal>
+          <div class="seg-icon"><svg class="icon"><use href="#icon-branch"></use></svg></div>
+          <h3>Zero repasse manual</h3>
+          <p>Split automático elimina planilhas e transferências avulsas para sócios, afiliados e fornecedores.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section" id="faq">
+    <div class="container container-narrow">
+      <h2 class="section-title" data-reveal>Perguntas frequentes</h2>
+
+      <div class="faq-list" data-reveal>
+        <details class="faq-item" open>
+          <summary>Quais documentos preciso para me cadastrar?</summary>
+          <p>Basta o CNPJ da empresa, dados dos sócios e comprovante de conta bancária. A análise costuma ser concluída em poucas horas.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Como funciona a antecipação de recebíveis?</summary>
+          <p>Pix é creditado na hora (D+0). Para os demais recebíveis, você solicita a antecipação direto no painel e recebe o valor líquido de acordo com a taxa vigente, geralmente em até D+2.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Meus dados e os dos meus clientes estão seguros?</summary>
+          <p>Sim. Operamos em conformidade com o padrão PCI DSS, com criptografia ponta a ponta e tokenização de dados de cartão.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Quanto tempo leva para integrar?</summary>
+          <p>Com nossa API documentada e SDKs prontos, integrações simples podem ir ao ar em poucos dias, com suporte técnico dedicado.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Existe taxa de adesão ou mensalidade fixa?</summary>
+          <p>Não. Você paga apenas sobre o que vende, conforme o plano escolhido — sem taxas escondidas.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA FINAL ============ -->
+  <section class="cta-final" id="cta">
+    <div class="container cta-final-inner" data-reveal>
+      <h2>Pronto para vender mais e receber mais rápido?</h2>
+      <p>Fale com nosso time e descubra a melhor solução de pagamentos para o seu negócio.</p>
+      <form class="cta-form" id="ctaForm">
+        <input type="text" placeholder="Seu nome" required>
+        <input type="email" placeholder="Seu e-mail" required>
+        <input type="tel" placeholder="WhatsApp" required>
+        <button type="submit" class="btn btn-primary">Quero falar com um especialista</button>
+      </form>
+      <span class="form-msg" id="formMsg"></span>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a href="#top" class="logo">
+        <svg width="30" height="30" viewBox="0 0 100 100" fill="none">
+          <rect width="100" height="100" rx="22" fill="url(#logoGradF)"/>
+          <path d="M28 70V30h9l26 27V30h9v40h-9L37 43v27z" fill="#061024"/>
+          <defs>
+            <linearGradient id="logoGradF" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#00E0C6"/><stop offset="1" stop-color="#2F6BFF"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="logo-word">NEXT <b>TECHNOLOGIES</b></span>
+      </a>
+      <p>Infraestrutura de pagamentos digitais com segurança, alta aprovação e velocidade para o seu negócio crescer.</p>
+      <div class="footer-badges">
+        <span><svg class="icon"><use href="#icon-shield-check"></use></svg>PCI DSS</span>
+        <span><svg class="icon"><use href="#icon-lock"></use></svg>Criptografia ponta a ponta</span>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Produto</h4>
+      <a href="#recursos">Recursos</a>
+      <a href="#planos">Planos</a>
+      <a href="#seguranca">Segurança</a>
+      <a href="#como-funciona">Como funciona</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Empresa</h4>
+      <a href="#solucoes">Soluções</a>
+      <a href="#faq">FAQ</a>
+      <a href="#cta">Contato</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Contato</h4>
+      <a href="mailto:admin.nexttech@proton.me">admin.nexttech@proton.me</a>
+      <a href="#cta">Fale com um especialista</a>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <span>© 2025 Next Technologies LTDA — CNPJ 67.924.272/0001-59. Todos os direitos reservados.</span>
+    <div class="footer-legal">
+      <a href="#">Termos de uso</a>
+      <a href="#">Privacidade</a>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

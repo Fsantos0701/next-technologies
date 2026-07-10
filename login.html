@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar — Next Technologies</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230B1229%22/><path d=%22M28 70V30h9l26 27V30h9v40h-9L37 43v27z%22 fill=%22%2300E0C6%22/></svg>">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<div class="bg-fx" aria-hidden="true"></div>
+
+<div class="auth-page">
+  <a href="/" class="logo auth-logo">
+    <svg width="34" height="34" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100" height="100" rx="22" fill="url(#logoGrad)"/>
+      <path d="M28 70V30h9l26 27V30h9v40h-9L37 43v27z" fill="#061024"/>
+      <defs>
+        <linearGradient id="logoGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#00E0C6"/><stop offset="1" stop-color="#2F6BFF"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <span class="logo-word">NEXT <b>TECHNOLOGIES</b></span>
+  </a>
+
+  <div class="auth-card">
+    <h1>Entrar na sua conta</h1>
+    <p class="auth-sub">Acesse o painel para acompanhar seus recebimentos.</p>
+
+    <form id="loginForm" class="auth-form" novalidate>
+      <label>
+        E-mail
+        <input type="email" name="email" placeholder="voce@empresa.com" required autocomplete="email">
+      </label>
+      <label>
+        Senha
+        <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+      </label>
+      <span class="auth-error" id="authError"></span>
+      <button type="submit" class="btn btn-primary btn-block btn-lg">Entrar</button>
+    </form>
+
+    <p class="auth-switch">Ainda não tem conta? <a href="/signup.html">Criar conta</a></p>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+  AuthForm.init({
+    formId: 'loginForm',
+    errorId: 'authError',
+    endpoint: '/api/login',
+    onSuccess: () => { window.location.href = '/dashboard.html'; },
+  });
+</script>
+</body>
+</html>

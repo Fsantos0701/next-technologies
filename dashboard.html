@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel — Next Technologies</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230B1229%22/><path d=%22M28 70V30h9l26 27V30h9v40h-9L37 43v27z%22 fill=%22%2300E0C6%22/></svg>">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<div class="bg-fx" aria-hidden="true"></div>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo">
+      <svg width="34" height="34" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100" height="100" rx="22" fill="url(#logoGrad)"/>
+        <path d="M28 70V30h9l26 27V30h9v40h-9L37 43v27z" fill="#061024"/>
+        <defs>
+          <linearGradient id="logoGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#00E0C6"/><stop offset="1" stop-color="#2F6BFF"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span class="logo-word">NEXT <b>TECHNOLOGIES</b></span>
+    </a>
+    <div class="header-actions">
+      <span class="dash-welcome" id="dashWelcome"></span>
+      <button class="btn btn-outline" id="logoutBtn">Sair</button>
+    </div>
+  </div>
+</header>
+
+<main class="dash-main">
+  <div class="container">
+    <h1 class="dash-title">Bem-vindo(a) de volta<span id="dashName"></span>.</h1>
+    <p class="section-sub left">Este é um painel de demonstração — os dados abaixo são ilustrativos.</p>
+
+    <div class="panel-stats dash-stats">
+      <div class="stat-box">
+        <span class="stat-label">Volume processado (30d)</span>
+        <span class="stat-value">R$ 1.284.930</span>
+        <span class="stat-up"><svg class="icon"><use href="#icon-trending-up"></use></svg>18,4%</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Taxa de aprovação</span>
+        <span class="stat-value">96,7%</span>
+        <span class="stat-up"><svg class="icon"><use href="#icon-trending-up"></use></svg>3,1%</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Conta logada</span>
+        <span class="stat-value" id="dashEmail" style="font-size:1rem;"></span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<svg class="icon-sprite" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="icon-trending-up" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></symbol>
+  </defs>
+</svg>
+
+<script src="auth.js"></script>
+<script>
+  (async () => {
+    const res = await fetch('/api/me');
+    if (!res.ok) { window.location.href = '/login.html'; return; }
+    const { user } = await res.json();
+    document.getElementById('dashWelcome').textContent = user.name;
+    document.getElementById('dashName').textContent = ', ' + user.name.split(' ')[0];
+    document.getElementById('dashEmail').textContent = user.email;
+  })();
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await fetch('/api/logout', { method: 'POST' });
+    window.location.href = '/login.html';
+  });
+</script>
+</body>
+</html>
