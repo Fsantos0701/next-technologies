@@ -12,10 +12,10 @@
 
 <div class="bg-fx" aria-hidden="true"></div>
 
-<header class="site-header">
-  <div class="container header-inner">
-    <a href="/" class="logo">
-      <svg width="34" height="34" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<div class="dash-layout">
+  <aside class="dash-sidebar">
+    <a href="/" class="logo dash-logo">
+      <svg width="30" height="30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="100" height="100" rx="22" fill="url(#logoGrad)"/>
         <path d="M28 70V30h9l26 27V30h9v40h-9L37 43v27z" fill="#061024"/>
         <defs>
@@ -26,40 +26,185 @@
       </svg>
       <span class="logo-word">NEXT <b>TECHNOLOGIES</b></span>
     </a>
-    <div class="header-actions">
-      <span class="dash-welcome" id="dashWelcome"></span>
-      <button class="btn btn-outline" id="logoutBtn">Sair</button>
-    </div>
-  </div>
-</header>
 
-<main class="dash-main">
-  <div class="container">
-    <h1 class="dash-title">Bem-vindo(a) de volta<span id="dashName"></span>.</h1>
-    <p class="section-sub left">Este é um painel de demonstração — os dados abaixo são ilustrativos.</p>
+    <nav class="dash-nav">
+      <span class="dash-nav-label">Minha loja</span>
+      <a href="/dashboard.html" class="dash-nav-item is-active"><svg class="icon"><use href="#icon-grid"></use></svg>Dashboard</a>
+      <a href="#" class="dash-nav-item"><svg class="icon"><use href="#icon-cart"></use></svg>Vendas</a>
+      <a href="#" class="dash-nav-item"><svg class="icon"><use href="#icon-activity"></use></svg>Transações</a>
+      <a href="#" class="dash-nav-item"><svg class="icon"><use href="#icon-alert"></use></svg>Contestações</a>
+      <a href="#" class="dash-nav-item"><svg class="icon"><use href="#icon-repeat"></use></svg>Recuperação</a>
+      <a href="#" class="dash-nav-item"><svg class="icon"><use href="#icon-percent"></use></svg>Taxas</a>
+      <a href="#" class="dash-nav-item"><svg class="icon"><use href="#icon-wallet"></use></svg>Saques</a>
+      <a href="#" class="dash-nav-item"><svg class="icon"><use href="#icon-plug"></use></svg>Integrações</a>
+      <a href="#" class="dash-nav-item"><svg class="icon"><use href="#icon-code"></use></svg>APIs</a>
+      <a href="#" class="dash-nav-item"><svg class="icon"><use href="#icon-branch"></use></svg>Webhooks</a>
+      <a href="#" class="dash-nav-item"><svg class="icon"><use href="#icon-mail"></use></svg>E-mails</a>
+      <a href="#" class="dash-nav-item"><svg class="icon"><use href="#icon-file-text"></use></svg>Relatórios</a>
+      <a href="#" class="dash-nav-item"><svg class="icon"><use href="#icon-settings"></use></svg>Configurações</a>
+      <a href="#" class="dash-nav-item"><svg class="icon"><use href="#icon-headset"></use></svg>Suporte</a>
+    </nav>
+  </aside>
 
-    <div class="panel-stats dash-stats">
-      <div class="stat-box">
-        <span class="stat-label">Volume processado (30d)</span>
-        <span class="stat-value">R$ 2.847.650</span>
-        <span class="stat-up"><svg class="icon"><use href="#icon-trending-up"></use></svg>18,4%</span>
+  <div class="dash-content">
+    <header class="dash-topbar">
+      <div>
+        <h1 class="dash-title">Dashboard</h1>
+        <p class="dash-subtitle">Visão geral da sua conta · <span id="dashName"></span></p>
       </div>
-      <div class="stat-box">
-        <span class="stat-label">Taxa de aprovação</span>
-        <span class="stat-value">96,7%</span>
-        <span class="stat-up"><svg class="icon"><use href="#icon-trending-up"></use></svg>3,1%</span>
+      <div class="dash-topbar-actions">
+        <button class="dash-icon-btn" aria-label="Notificações" type="button">
+          <svg class="icon"><use href="#icon-bell"></use></svg>
+        </button>
+        <div class="dash-user">
+          <span class="dash-avatar" id="dashAvatar"></span>
+          <span class="dash-user-name" id="dashWelcome"></span>
+        </div>
+        <button class="btn btn-outline btn-sm" id="logoutBtn" type="button">Sair</button>
       </div>
-      <div class="stat-box">
-        <span class="stat-label">Conta logada</span>
-        <span class="stat-value" id="dashEmail" style="font-size:1rem;"></span>
+    </header>
+
+    <div class="dash-filters">
+      <div class="dash-tabs">
+        <button class="dash-tab" type="button">Hoje</button>
+        <button class="dash-tab" type="button">Ontem</button>
+        <button class="dash-tab is-active" type="button">7 dias</button>
+        <button class="dash-tab" type="button">30 dias</button>
+        <button class="dash-tab" type="button">Custom</button>
       </div>
+      <button class="btn btn-outline btn-sm" type="button">
+        <svg class="icon"><use href="#icon-download"></use></svg>
+        Exportar
+      </button>
     </div>
+
+    <p class="dash-demo-note">Conta nova — os números abaixo começam zerados e vão sendo preenchidos conforme você recebe pagamentos.</p>
+
+    <section class="dstat-grid">
+      <div class="dstat-card">
+        <div class="dstat-head"><span>Volume · 7 dias</span><svg class="icon"><use href="#icon-bar-chart"></use></svg></div>
+        <div class="dstat-value">R$ 0,00</div>
+      </div>
+      <div class="dstat-card">
+        <div class="dstat-head"><span>Volume no mês</span><svg class="icon"><use href="#icon-trending-up"></use></svg></div>
+        <div class="dstat-value">R$ 0,00</div>
+      </div>
+      <div class="dstat-card">
+        <div class="dstat-head"><span>Ticket médio</span><svg class="icon"><use href="#icon-receipt"></use></svg></div>
+        <div class="dstat-value">R$ 0,00</div>
+      </div>
+      <div class="dstat-card">
+        <div class="dstat-head"><span>Taxa de aprovação</span><svg class="icon"><use href="#icon-check"></use></svg></div>
+        <div class="dstat-value">—</div>
+      </div>
+    </section>
+
+    <section class="dpanel-row">
+      <div class="dpanel">
+        <div class="dpanel-head"><span>Saldo disponível</span><svg class="icon"><use href="#icon-wallet"></use></svg></div>
+        <div class="dpanel-value">R$ 0,00</div>
+        <div class="dpanel-actions">
+          <button class="btn btn-primary btn-sm" type="button" disabled title="Disponível após sua primeira venda">Sacar agora</button>
+          <button class="btn btn-outline btn-sm" type="button" disabled title="Disponível após sua primeira venda">Antecipar</button>
+        </div>
+      </div>
+      <div class="dpanel">
+        <div class="dpanel-head"><span>A liberar / retido</span><svg class="icon"><use href="#icon-clock"></use></svg></div>
+        <div class="dpanel-line"><span>Recebível de cartão <small>(libera D+2 a D+30)</small></span><b>R$ 0,00</b></div>
+        <div class="dpanel-line"><span>Reserva de segurança <small>(liberação manual)</small></span><b>R$ 0,00</b></div>
+      </div>
+      <div class="dpanel">
+        <div class="dpanel-head"><span>Próximo saque</span><svg class="icon"><use href="#icon-calendar"></use></svg></div>
+        <div class="dpanel-value">R$ 0,00</div>
+        <span class="dpanel-note">Nenhum saque agendado</span>
+      </div>
+    </section>
+
+    <section class="dchart-row">
+      <div class="dpanel dchart">
+        <div class="dpanel-head"><span>Vendas por dia</span><small>Últimos 7 dias</small></div>
+        <div class="dchart-empty">
+          <svg viewBox="0 0 400 110" preserveAspectRatio="none" class="dchart-svg">
+            <line x1="0" y1="20" x2="400" y2="20" class="dchart-grid"/>
+            <line x1="0" y1="55" x2="400" y2="55" class="dchart-grid"/>
+            <line x1="0" y1="90" x2="400" y2="90" class="dchart-grid"/>
+            <line x1="0" y1="92" x2="400" y2="92" class="dchart-flatline"/>
+          </svg>
+          <div class="dchart-empty-label">
+            <svg class="icon"><use href="#icon-bar-chart"></use></svg>
+            Ainda sem vendas neste período
+          </div>
+        </div>
+      </div>
+      <div class="dpanel ddonut">
+        <div class="dpanel-head"><span>Aprovação por método</span></div>
+        <div class="ddonut-ring">
+          <span class="ddonut-center">Sem dados</span>
+        </div>
+        <ul class="ddonut-legend">
+          <li><i class="ddot" style="background:var(--accent)"></i>Pix<b>—</b></li>
+          <li><i class="ddot" style="background:var(--primary)"></i>Crédito<b>—</b></li>
+          <li><i class="ddot" style="background:var(--border)"></i>Boleto<b>—</b></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="dtable-row">
+      <div class="dpanel dtable">
+        <div class="dpanel-head"><span>Últimas vendas</span><a href="#" class="dpanel-link">Ver todas</a></div>
+        <div class="dempty-state">
+          <svg class="icon"><use href="#icon-inbox"></use></svg>
+          <p>Nenhuma venda ainda</p>
+          <span>Assim que você receber seu primeiro pagamento, ele aparece aqui.</span>
+        </div>
+      </div>
+      <div class="dside-col">
+        <div class="dpanel dside">
+          <div class="dpanel-head"><span>Últimos saques</span><a href="#" class="dpanel-link">Ver</a></div>
+          <div class="dempty-state dempty-small">
+            <svg class="icon"><use href="#icon-inbox"></use></svg>
+            <p>Nenhum saque ainda</p>
+          </div>
+        </div>
+        <div class="dpanel dnotification">
+          <svg class="icon"><use href="#icon-shield-check"></use></svg>
+          <div class="dnotification-body">
+            <b>Proteja sua conta com 2FA</b>
+            <span>Ative a verificação em duas etapas para login e saques.</span>
+          </div>
+          <button class="btn btn-outline btn-sm" type="button">Ativar</button>
+        </div>
+      </div>
+    </section>
   </div>
-</main>
+</div>
 
 <svg class="icon-sprite" aria-hidden="true" focusable="false">
   <defs>
+    <symbol id="icon-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></symbol>
+    <symbol id="icon-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.4 12.4a2 2 0 0 0 2 1.6h8.6a2 2 0 0 0 2-1.6L22 7H6"/></symbol>
+    <symbol id="icon-activity" viewBox="0 0 24 24"><path d="M3 12h4l2 7 4-14 2 7h6"/></symbol>
+    <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></symbol>
+    <symbol id="icon-repeat" viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
+    <symbol id="icon-percent" viewBox="0 0 24 24"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></symbol>
+    <symbol id="icon-wallet" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 5H4"/><circle cx="17" cy="13" r="1.4"/></symbol>
+    <symbol id="icon-plug" viewBox="0 0 24 24"><path d="M9 2v4"/><path d="M15 2v4"/><path d="M6 8h12v4a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5V8z"/><path d="M12 17v5"/></symbol>
+    <symbol id="icon-code" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
+    <symbol id="icon-branch" viewBox="0 0 24 24"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></symbol>
+    <symbol id="icon-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
+    <symbol id="icon-file-text" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="icon-headset" viewBox="0 0 24 24"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="2" y="13" width="5" height="7" rx="2"/><rect x="17" y="13" width="5" height="7" rx="2"/><path d="M20 20a4 4 0 0 1-4 3h-2"/></symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 21a2 2 0 0 0 4 0"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+    <symbol id="icon-bar-chart" viewBox="0 0 24 24"><path d="M4 20V10"/><path d="M12 20V4"/><path d="M20 20v-7"/></symbol>
     <symbol id="icon-trending-up" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></symbol>
+    <symbol id="icon-receipt" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3z"/><path d="M9 8h6"/><path d="M9 12h6"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></symbol>
+    <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+    <symbol id="icon-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+    <symbol id="icon-shield-check" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></symbol>
   </defs>
 </svg>
 
@@ -70,8 +215,8 @@
     if (!res.ok) { window.location.href = '/login.html'; return; }
     const { user } = await res.json();
     document.getElementById('dashWelcome').textContent = user.name;
-    document.getElementById('dashName').textContent = ', ' + user.name.split(' ')[0];
-    document.getElementById('dashEmail').textContent = user.email;
+    document.getElementById('dashName').textContent = user.name;
+    document.getElementById('dashAvatar').textContent = user.name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
   })();
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
