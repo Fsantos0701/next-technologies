@@ -1,3 +1,13 @@
+document.querySelectorAll('.password-toggle').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const input = document.getElementById(btn.dataset.target);
+    const showing = input.type === 'text';
+    input.type = showing ? 'password' : 'text';
+    btn.querySelector('use').setAttribute('href', showing ? '#icon-eye' : '#icon-eye-off');
+    btn.setAttribute('aria-label', showing ? 'Mostrar senha' : 'Ocultar senha');
+  });
+});
+
 window.AuthForm = {
   init({ formId, errorId, endpoint, onSuccess }) {
     const form = document.getElementById(formId);

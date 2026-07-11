@@ -25,6 +25,16 @@
 .auth-switch a{color:var(--accent);font-weight:600;}
 .auth-forgot{align-self:flex-end;margin-top:-6px;font-size:0.82rem;color:var(--text-muted);}
 .auth-forgot:hover{color:var(--accent);}
+
+.password-field{position:relative;display:flex;}
+.password-field input{width:100%;padding-right:44px;}
+.password-toggle{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;justify-content:center;padding:4px;
+  background:none;border:none;color:var(--text-muted);cursor:pointer;
+}
+.password-toggle:hover{color:var(--accent);}
+.password-toggle .icon{width:18px;height:18px;}
 #codeInput{letter-spacing:8px;font-size:1.3rem;font-weight:700;text-align:center;}
 
 /* dashboard */

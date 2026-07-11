@@ -37,7 +37,12 @@
       </label>
       <label>
         Senha
-        <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+        <div class="password-field">
+          <input type="password" name="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+          <button type="button" class="password-toggle" data-target="loginPassword" aria-label="Mostrar senha">
+            <svg class="icon"><use href="#icon-eye"></use></svg>
+          </button>
+        </div>
       </label>
       <a href="/forgot-password.html" class="auth-forgot">Esqueceu sua senha?</a>
       <span class="auth-error" id="authError"></span>
@@ -47,6 +52,13 @@
     <p class="auth-switch">Ainda não tem conta? <a href="/signup.html">Criar conta</a></p>
   </div>
 </div>
+
+<svg class="icon-sprite" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="icon-eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a19.7 19.7 0 0 1 5.06-5.94M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 8 11 8a19.7 19.7 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></symbol>
+  </defs>
+</svg>
 
 <script src="auth.js"></script>
 <script>
