@@ -3,7 +3,7 @@ const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
-const { findByEmail, createUser, updatePassword } = require('./lib/userStore');
+const { findByEmail, findById, createUser, updatePassword } = require('./lib/userStore');
 const { createPending, getPending, deletePending } = require('./lib/pendingSignups');
 const { createPendingReset, getPendingReset, deletePendingReset } = require('./lib/pendingResets');
 const { sendVerificationEmail, sendResetCodeEmail } = require('./lib/mailer');
@@ -36,7 +36,7 @@ app.post('/api/signup/request-code', async (req, res) => {
   if (!name || !name.trim()) return res.status(400).json({ error: 'Informe seu nome.' });
   if (!isValidEmail(email)) return res.status(400).json({ error: 'Informe um e-mail válido.' });
   if (!password || password.length < 6) return res.status(400).json({ error: 'A senha precisa ter pelo menos 6 caracteres.' });
-  if (findByEmail(email)) return res.status(409).json({ error: 'Já existe uma conta com este e-mail.' });
+  if (await findByEmail(email)) return res.status(409).json({ error: 'Já existe uma conta com este e-mail.' });
 
   const passwordHash = await bcrypt.hash(password, 10);
   const code = createPending(email, { name: name.trim(), passwordHash });
@@ -51,7 +51,7 @@ app.post('/api/signup/request-code', async (req, res) => {
 });
 
 // Passo 2: confirma o código e só então cria a conta de verdade.
-app.post('/api/signup/verify-code', (req, res) => {
+app.post('/api/signup/verify-code', async (req, res) => {
   const { email, code } = req.body || {};
   if (!isValidEmail(email) || !code) return res.status(400).json({ error: 'Informe o código recebido por e-mail.' });
 
@@ -59,7 +59,7 @@ app.post('/api/signup/verify-code', (req, res) => {
   if (!entry) return res.status(400).json({ error: 'Código expirado. Solicite um novo cadastro.' });
   if (entry.code !== String(code).trim()) return res.status(400).json({ error: 'Código incorreto.' });
 
-  const user = createUser({ name: entry.name, email, passwordHash: entry.passwordHash });
+  const user = await createUser({ name: entry.name, email, passwordHash: entry.passwordHash });
   deletePending(email);
 
   req.session.userId = user.id;
@@ -87,7 +87,7 @@ app.post('/api/forgot-password', async (req, res) => {
   const { email } = req.body || {};
   if (!isValidEmail(email)) return res.status(400).json({ error: 'Informe um e-mail válido.' });
 
-  const user = findByEmail(email);
+  const user = await findByEmail(email);
   if (!user) return res.json({ ok: true });
 
   const code = createPendingReset(email);
@@ -110,7 +110,7 @@ app.post('/api/reset-password', async (req, res) => {
   if (entry.code !== String(code).trim()) return res.status(400).json({ error: 'Código incorreto.' });
 
   const passwordHash = await bcrypt.hash(newPassword, 10);
-  updatePassword(email, passwordHash);
+  await updatePassword(email, passwordHash);
   deletePendingReset(email);
 
   res.json({ ok: true });
@@ -118,7 +118,7 @@ app.post('/api/reset-password', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body || {};
-  const user = findByEmail(email || '');
+  const user = await findByEmail(email || '');
 
   if (!user) return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
 
@@ -133,10 +133,9 @@ app.post('/api/logout', (req, res) => {
   req.session.destroy(() => res.json({ ok: true }));
 });
 
-app.get('/api/me', (req, res) => {
+app.get('/api/me', async (req, res) => {
   if (!req.session.userId) return res.status(401).json({ error: 'Não autenticado.' });
-  const users = require('./lib/userStore').readUsers();
-  const user = users.find(u => u.id === req.session.userId);
+  const user = await findById(req.session.userId);
   if (!user) return res.status(401).json({ error: 'Não autenticado.' });
   res.json({ user: { name: user.name, email: user.email } });
 });
@@ -150,4 +149,9 @@ app.get('/dashboard.html', (req, res, next) => {
 // ---------- Arquivos estáticos ----------
 app.use(express.static(__dirname));
 
-app.listen(PORT, () => console.log(`Next Technologies rodando em http://localhost:${PORT}`));
+(async () => {
+  if (process.env.DATABASE_URL) {
+    await require('./lib/db').ensureSchema();
+  }
+  app.listen(PORT, () => console.log(`Next Technologies rodando em http://localhost:${PORT}`));
+})();
