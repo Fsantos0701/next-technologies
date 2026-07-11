@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const express = require('express');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
-const { findByEmail, findById, createUser, updatePassword, updateName, setApiKey } = require('./lib/userStore');
+const { findByEmail, findById, createUser, updatePassword, updateName, setApiKey, listUsers, setStatus, deleteUser } = require('./lib/userStore');
 const { createPending, getPending, deletePending } = require('./lib/pendingSignups');
 const { createPendingReset, getPendingReset, deletePendingReset } = require('./lib/pendingResets');
 const { sendVerificationEmail, sendResetCodeEmail, sendSupportEmail } = require('./lib/mailer');
@@ -25,6 +25,22 @@ app.use(session({
 
 function isValidEmail(email) {
   return typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '')
+  .split(',')
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
+
+function isAdminEmail(email) {
+  return ADMIN_EMAILS.includes(String(email || '').toLowerCase());
+}
+
+async function requireAdmin(req, res, next) {
+  if (!req.session.userId) return res.status(401).json({ error: 'Não autenticado.' });
+  const user = await findById(req.session.userId);
+  if (!user || !isAdminEmail(user.email)) return res.status(403).json({ error: 'Acesso restrito ao administrador.' });
+  next();
 }
 
 // ---------- API ----------
@@ -126,6 +142,8 @@ app.post('/api/login', async (req, res) => {
   const match = await bcrypt.compare(password || '', user.passwordHash);
   if (!match) return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
 
+  if (user.status === 'suspended') return res.status(403).json({ error: 'Sua conta foi suspensa. Entre em contato com o suporte.' });
+
   req.session.userId = user.id;
   res.json({ ok: true, user: { name: user.name, email: user.email } });
 });
@@ -138,7 +156,7 @@ app.get('/api/me', async (req, res) => {
   if (!req.session.userId) return res.status(401).json({ error: 'Não autenticado.' });
   const user = await findById(req.session.userId);
   if (!user) return res.status(401).json({ error: 'Não autenticado.' });
-  res.json({ user: { name: user.name, email: user.email, apiKey: user.apiKey || null } });
+  res.json({ user: { name: user.name, email: user.email, apiKey: user.apiKey || null, isAdmin: isAdminEmail(user.email) } });
 });
 
 // ---------- Conta ----------
@@ -195,6 +213,58 @@ app.post('/api/support', async (req, res) => {
   }
 });
 
+// ---------- Administração ----------
+app.get('/api/admin/users', requireAdmin, async (req, res) => {
+  const users = await listUsers();
+  res.json({ users });
+});
+
+app.get('/api/admin/stats', requireAdmin, async (req, res) => {
+  const users = await listUsers();
+  const now = new Date();
+
+  const days = [];
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    days.push(d.toISOString().slice(0, 10));
+  }
+  const counts = Object.fromEntries(days.map((d) => [d, 0]));
+  users.forEach((u) => {
+    const day = new Date(u.createdAt).toISOString().slice(0, 10);
+    if (counts[day] !== undefined) counts[day]++;
+  });
+
+  const last7 = users.filter((u) => now - new Date(u.createdAt) <= 7 * 24 * 60 * 60 * 1000).length;
+  const last30 = users.filter((u) => now - new Date(u.createdAt) <= 30 * 24 * 60 * 60 * 1000).length;
+  const suspended = users.filter((u) => u.status === 'suspended').length;
+
+  res.json({
+    total: users.length,
+    last7,
+    last30,
+    active: users.length - suspended,
+    suspended,
+    daily: days.map((d) => ({ date: d, count: counts[d] })),
+  });
+});
+
+app.post('/api/admin/users/:id/suspend', requireAdmin, async (req, res) => {
+  await setStatus(req.params.id, 'suspended');
+  res.json({ ok: true });
+});
+
+app.post('/api/admin/users/:id/activate', requireAdmin, async (req, res) => {
+  await setStatus(req.params.id, 'active');
+  res.json({ ok: true });
+});
+
+app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
+  if (req.params.id === req.session.userId) return res.status(400).json({ error: 'Você não pode excluir sua própria conta de admin.' });
+  await deleteUser(req.params.id);
+  res.json({ ok: true });
+});
+
 // ---------- Páginas protegidas ----------
 const PROTECTED_PAGES = [
   '/dashboard.html', '/vendas.html', '/transacoes.html', '/contestacoes.html',
@@ -204,6 +274,13 @@ const PROTECTED_PAGES = [
 ];
 app.get(PROTECTED_PAGES, (req, res, next) => {
   if (!req.session.userId) return res.redirect('/login.html');
+  next();
+});
+
+app.get('/admin.html', async (req, res, next) => {
+  if (!req.session.userId) return res.redirect('/login.html');
+  const user = await findById(req.session.userId);
+  if (!user || !isAdminEmail(user.email)) return res.redirect('/dashboard.html');
   next();
 });
 

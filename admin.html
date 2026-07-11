@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administração — Next Technologies</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230B1229%22/><path d=%22M28 70V30h9l26 27V30h9v40h-9L37 43v27z%22 fill=%22%2300E0C6%22/></svg>">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<div class="bg-fx" aria-hidden="true"></div>
+<div class="dash-layout">
+  <aside class="dash-sidebar" id="dashSidebar"></aside>
+  <div class="dash-content">
+    <header class="dash-topbar" id="dashTopbar"></header>
+
+    <p class="dash-demo-note">Painel restrito ao administrador — mostra todas as contas cadastradas no sistema.</p>
+
+    <section class="dstat-grid">
+      <div class="dstat-card">
+        <div class="dstat-head"><span>Total de usuários</span><svg class="icon"><use href="#icon-grid"></use></svg></div>
+        <div class="dstat-value" id="statTotal">—</div>
+      </div>
+      <div class="dstat-card">
+        <div class="dstat-head"><span>Novos · 7 dias</span><svg class="icon"><use href="#icon-trending-up"></use></svg></div>
+        <div class="dstat-value" id="statLast7">—</div>
+      </div>
+      <div class="dstat-card">
+        <div class="dstat-head"><span>Novos · 30 dias</span><svg class="icon"><use href="#icon-calendar"></use></svg></div>
+        <div class="dstat-value" id="statLast30">—</div>
+      </div>
+      <div class="dstat-card">
+        <div class="dstat-head"><span>Ativos / Suspensos</span><svg class="icon"><use href="#icon-shield-check"></use></svg></div>
+        <div class="dstat-value" id="statActiveSuspended">—</div>
+      </div>
+    </section>
+
+    <div class="dpanel" style="margin-top:14px;">
+      <div class="dpanel-head"><span>Novos cadastros por dia</span><small>Últimos 14 dias</small></div>
+      <div class="admin-chart-wrap">
+        <div class="admin-bar-chart" id="signupChart"></div>
+        <div class="admin-tooltip" id="chartTooltip"></div>
+      </div>
+    </div>
+
+    <div class="dpanel" style="margin-top:14px;">
+      <div class="dpanel-head"><span>Usuários cadastrados</span></div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Cadastro</th>
+              <th>Status</th>
+              <th>Chave API</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr><td colspan="5" style="color:var(--text-muted);">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+<script src="dashboard-shell.js"></script>
+<script>
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function renderChart(daily) {
+    const chart = document.getElementById('signupChart');
+    const tooltip = document.getElementById('chartTooltip');
+    const max = Math.max(1, ...daily.map((d) => d.count));
+
+    chart.innerHTML = daily.map((d) => {
+      const heightPct = Math.max(3, Math.round((d.count / max) * 100));
+      const label = new Date(d.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      return (
+        '<div class="admin-bar-col">' +
+        '<div class="admin-bar" style="height:' + heightPct + '%" data-date="' + label + '" data-count="' + d.count + '"></div>' +
+        '<span class="admin-bar-label">' + label + '</span>' +
+        '</div>'
+      );
+    }).join('');
+
+    chart.querySelectorAll('.admin-bar').forEach((bar) => {
+      bar.addEventListener('mouseenter', (e) => {
+        const rect = bar.getBoundingClientRect();
+        const wrapRect = chart.parentElement.getBoundingClientRect();
+        tooltip.innerHTML = '<b>' + bar.dataset.count + '</b> cadastro(s) em ' + bar.dataset.date;
+        tooltip.style.left = (rect.left - wrapRect.left + rect.width / 2) + 'px';
+        tooltip.style.top = (rect.top - wrapRect.top) + 'px';
+        tooltip.classList.add('is-visible');
+      });
+      bar.addEventListener('mouseleave', () => tooltip.classList.remove('is-visible'));
+    });
+  }
+
+  function statusBadge(status) {
+    const isSuspended = status === 'suspended';
+    return '<span class="status-badge ' + (isSuspended ? 'is-suspended' : 'is-active') + '">' +
+      (isSuspended ? 'Suspenso' : 'Ativo') + '</span>';
+  }
+
+  async function loadUsers() {
+    const res = await fetch('/api/admin/users');
+    const body = await res.json();
+    const tbody = document.getElementById('usersTableBody');
+
+    if (!body.users || body.users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);">Nenhum usuário cadastrado ainda.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = body.users.map((u) => (
+      '<tr data-id="' + u.id + '">' +
+      '<td><div>' + u.name + '</div><div class="user-email">' + u.email + '</div></td>' +
+      '<td>' + formatDate(u.createdAt) + '</td>' +
+      '<td>' + statusBadge(u.status) + '</td>' +
+      '<td>' + (u.apiKey ? 'Sim' : '—') + '</td>' +
+      '<td><div class="admin-row-actions">' +
+      (u.status === 'suspended'
+        ? '<button class="admin-action-btn" data-action="activate" title="Reativar"><svg class="icon"><use href="#icon-check"></use></svg></button>'
+        : '<button class="admin-action-btn" data-action="suspend" title="Suspender"><svg class="icon"><use href="#icon-alert"></use></svg></button>') +
+      '<button class="admin-action-btn is-danger" data-action="delete" title="Excluir"><svg class="icon"><use href="#icon-trash"></use></svg></button>' +
+      '</div></td>' +
+      '</tr>'
+    )).join('');
+  }
+
+  async function loadStats() {
+    const res = await fetch('/api/admin/stats');
+    const stats = await res.json();
+    document.getElementById('statTotal').textContent = stats.total;
+    document.getElementById('statLast7').textContent = stats.last7;
+    document.getElementById('statLast30').textContent = stats.last30;
+    document.getElementById('statActiveSuspended').textContent = stats.active + ' / ' + stats.suspended;
+    renderChart(stats.daily);
+  }
+
+  document.getElementById('usersTableBody').addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const row = btn.closest('tr');
+    const id = row.dataset.id;
+    const action = btn.dataset.action;
+
+    if (action === 'suspend' && !confirm('Suspender esta conta? O usuário não vai conseguir mais fazer login.')) return;
+    if (action === 'delete' && !confirm('Excluir esta conta permanentemente? Essa ação não pode ser desfeita.')) return;
+
+    const endpoint = action === 'delete'
+      ? { url: '/api/admin/users/' + id, method: 'DELETE' }
+      : { url: '/api/admin/users/' + id + '/' + action, method: 'POST' };
+
+    const res = await fetch(endpoint.url, { method: endpoint.method });
+    const body = await res.json();
+    if (!res.ok) { alert(body.error || 'Algo deu errado.'); return; }
+    loadUsers();
+    loadStats();
+  });
+
+  DashboardShell.init({ page: 'admin', title: 'Administração', subtitle: 'Usuários cadastrados no sistema' }).then((user) => {
+    if (!user) return;
+    loadStats();
+    loadUsers();
+  });
+</script>
+</body>
+</html>

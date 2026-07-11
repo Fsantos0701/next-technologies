@@ -100,6 +100,20 @@
       document.getElementById('dashName').textContent = user.name;
       document.getElementById('dashAvatar').textContent = user.name.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
 
+      if (user.isAdmin && sidebar) {
+        const nav = sidebar.querySelector('.dash-nav');
+        const label = document.createElement('span');
+        label.className = 'dash-nav-label';
+        label.style.marginTop = '14px';
+        label.textContent = 'Administração';
+        const link = document.createElement('a');
+        link.href = '/admin.html';
+        link.className = 'dash-nav-item' + (page === 'admin' ? ' is-active' : '');
+        link.innerHTML = '<svg class="icon"><use href="#icon-shield-check"></use></svg>Usuários';
+        nav.appendChild(label);
+        nav.appendChild(link);
+      }
+
       document.getElementById('logoutBtn').addEventListener('click', async () => {
         await fetch('/api/logout', { method: 'POST' });
         window.location.href = '/login.html';
