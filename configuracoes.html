@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configurações — Next Technologies</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230B1229%22/><path d=%22M28 70V30h9l26 27V30h9v40h-9L37 43v27z%22 fill=%22%2300E0C6%22/></svg>">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<div class="bg-fx" aria-hidden="true"></div>
+<div class="dash-layout">
+  <aside class="dash-sidebar" id="dashSidebar"></aside>
+  <div class="dash-content">
+    <header class="dash-topbar" id="dashTopbar"></header>
+    <div class="dpage-content">
+
+      <div class="dpanel">
+        <div class="dpanel-head"><span>Dados da conta</span></div>
+        <form id="nameForm" class="dform">
+          <label>
+            Nome completo
+            <input type="text" name="name" id="nameInput" required>
+          </label>
+          <label>
+            E-mail
+            <input type="email" id="emailInput" disabled>
+          </label>
+          <span class="dform-msg" id="nameMsg"></span>
+          <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-start;">Salvar nome</button>
+        </form>
+
+        <div class="dpanel-divider">
+          <div class="dpanel-head"><span>Alterar senha</span></div>
+          <form id="passwordForm" class="dform">
+            <label>
+              Senha atual
+              <div class="password-field">
+                <input type="password" name="currentPassword" id="currentPasswordInput" required autocomplete="current-password">
+                <button type="button" class="password-toggle" data-target="currentPasswordInput" aria-label="Mostrar senha">
+                  <svg class="icon"><use href="#icon-eye"></use></svg>
+                </button>
+              </div>
+            </label>
+            <label>
+              Nova senha
+              <div class="password-field">
+                <input type="password" name="newPassword" id="newPasswordInput" required minlength="6" autocomplete="new-password">
+                <button type="button" class="password-toggle" data-target="newPasswordInput" aria-label="Mostrar senha">
+                  <svg class="icon"><use href="#icon-eye"></use></svg>
+                </button>
+              </div>
+            </label>
+            <span class="dform-msg" id="passwordMsg"></span>
+            <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-start;">Alterar senha</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script src="dashboard-shell.js"></script>
+<script src="auth.js"></script>
+<script>
+  DashboardShell.init({ page: 'configuracoes', title: 'Configurações', subtitle: 'Dados da conta e segurança' }).then((user) => {
+    if (!user) return;
+    document.getElementById('nameInput').value = user.name;
+    document.getElementById('emailInput').value = user.email;
+  });
+
+  const nameForm = document.getElementById('nameForm');
+  const nameMsg = document.getElementById('nameMsg');
+  nameForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    nameMsg.className = 'dform-msg';
+    nameMsg.textContent = '';
+    const name = document.getElementById('nameInput').value;
+    try {
+      const res = await fetch('/api/account/name', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      const body = await res.json();
+      if (!res.ok) { nameMsg.className = 'dform-msg is-error'; nameMsg.textContent = body.error || 'Algo deu errado.'; return; }
+      nameMsg.className = 'dform-msg is-success';
+      nameMsg.textContent = 'Nome atualizado com sucesso.';
+      document.getElementById('dashWelcome').textContent = body.user.name;
+      document.getElementById('dashName').textContent = body.user.name;
+      document.getElementById('dashAvatar').textContent = body.user.name.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+    } catch (err) {
+      nameMsg.className = 'dform-msg is-error';
+      nameMsg.textContent = 'Não foi possível conectar ao servidor.';
+    }
+  });
+
+  const passwordForm = document.getElementById('passwordForm');
+  const passwordMsg = document.getElementById('passwordMsg');
+  passwordForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    passwordMsg.className = 'dform-msg';
+    passwordMsg.textContent = '';
+    const currentPassword = document.getElementById('currentPasswordInput').value;
+    const newPassword = document.getElementById('newPasswordInput').value;
+    try {
+      const res = await fetch('/api/account/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const body = await res.json();
+      if (!res.ok) { passwordMsg.className = 'dform-msg is-error'; passwordMsg.textContent = body.error || 'Algo deu errado.'; return; }
+      passwordMsg.className = 'dform-msg is-success';
+      passwordMsg.textContent = 'Senha alterada com sucesso.';
+      passwordForm.reset();
+    } catch (err) {
+      passwordMsg.className = 'dform-msg is-error';
+      passwordMsg.textContent = 'Não foi possível conectar ao servidor.';
+    }
+  });
+</script>
+</body>
+</html>

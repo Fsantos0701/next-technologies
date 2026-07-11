@@ -167,3 +167,40 @@
   .dstat-grid{grid-template-columns:1fr;}
   .dnotification{flex-direction:column;align-items:flex-start;}
 }
+
+/* ===== simple sub-pages (empty states, forms) ===== */
+.dpage-content{margin-top:22px;display:flex;flex-direction:column;gap:16px;}
+
+.dform{display:flex;flex-direction:column;gap:16px;max-width:440px;margin-top:16px;}
+.dform label{display:flex;flex-direction:column;gap:8px;font-size:0.85rem;color:var(--text-muted);font-weight:600;}
+.dform input,.dform textarea{
+  padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);
+  background:var(--bg-2);color:var(--text);font-size:0.92rem;font-weight:400;font-family:inherit;
+}
+.dform input:focus,.dform textarea:focus{outline:none;border-color:var(--accent);}
+.dform input:disabled{opacity:0.6;}
+.dform textarea{resize:vertical;min-height:120px;}
+.dform-msg{font-size:0.84rem;min-height:1.2em;}
+.dform-msg.is-error{color:#FF8A8A;}
+.dform-msg.is-success{color:var(--accent);}
+.dpanel-divider{border-top:1px solid var(--border);margin:28px 0 0;padding-top:24px;}
+
+.api-key-row{display:flex;align-items:center;gap:10px;margin-top:16px;}
+.api-key-value{
+  flex:1;padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);
+  background:var(--bg-2);color:var(--text);font-size:0.85rem;font-family:'Courier New',monospace;
+  overflow-x:auto;white-space:nowrap;
+}
+.api-key-actions{display:flex;gap:8px;}
+.api-key-actions .dash-icon-btn{width:38px;height:38px;}
+
+.dtaxas-table{width:100%;border-collapse:collapse;margin-top:16px;}
+.dtaxas-table th{text-align:left;color:var(--text-muted);font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;padding:0 14px 10px;border-bottom:1px solid var(--border);}
+.dtaxas-table td{padding:14px;border-bottom:1px solid var(--border);font-size:0.88rem;}
+.dtaxas-table tr:last-child td{border-bottom:none;}
+.dtaxas-table td:first-child,.dtaxas-table th:first-child{padding-left:0;}
+.dtaxas-plan{font-weight:700;}
+.dtaxas-badge{
+  display:inline-block;font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:999px;
+  background:rgba(0,224,198,0.12);color:var(--accent);margin-left:8px;
+}

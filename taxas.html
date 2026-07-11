@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taxas — Next Technologies</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230B1229%22/><path d=%22M28 70V30h9l26 27V30h9v40h-9L37 43v27z%22 fill=%22%2300E0C6%22/></svg>">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<div class="bg-fx" aria-hidden="true"></div>
+<div class="dash-layout">
+  <aside class="dash-sidebar" id="dashSidebar"></aside>
+  <div class="dash-content">
+    <header class="dash-topbar" id="dashTopbar"></header>
+    <div class="dpage-content">
+      <div class="dpanel">
+        <div class="dpanel-head"><span>Seu plano atual</span></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+          <span class="dpanel-value" style="margin-top:0;font-size:1.3rem;">Essencial</span>
+          <span class="dtaxas-badge">Ativo</span>
+        </div>
+        <span class="dpanel-note">Sem mensalidade — você paga apenas sobre o que vender.</span>
+      </div>
+
+      <div class="dpanel">
+        <div class="dpanel-head"><span>Tarifas por método de pagamento</span></div>
+        <div style="overflow-x:auto;">
+          <table class="dtaxas-table">
+            <thead>
+              <tr><th>Método</th><th>Taxa</th><th>Prazo de recebimento</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="dtaxas-plan">Pix</td><td>0,99%</td><td>D+0 (na hora)</td></tr>
+              <tr><td class="dtaxas-plan">Cartão de crédito à vista</td><td>3,49%</td><td>D+30 (ou D+2 antecipado)</td></tr>
+              <tr><td class="dtaxas-plan">Cartão de crédito parcelado</td><td>3,99% + 1,2% a.m.</td><td>D+30 (ou D+2 antecipado)</td></tr>
+              <tr><td class="dtaxas-plan">Boleto</td><td>R$ 2,90 por boleto pago</td><td>D+1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="dpanel">
+        <div class="dpanel-head"><span>Outros planos disponíveis</span></div>
+        <div style="overflow-x:auto;">
+          <table class="dtaxas-table">
+            <thead>
+              <tr><th>Plano</th><th>Mensalidade</th><th>Taxa cartão à vista</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="dtaxas-plan">Essencial</td><td>R$ 0</td><td>3,49%</td></tr>
+              <tr><td class="dtaxas-plan">Pro</td><td>R$ 99/mês</td><td>2,89%</td></tr>
+              <tr><td class="dtaxas-plan">Corporativo</td><td>Sob consulta</td><td>A partir de 2,29%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <span class="dpanel-note">Fale com o <a href="/suporte.html" style="color:var(--accent);font-weight:600;">suporte</a> para migrar de plano.</span>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="dashboard-shell.js"></script>
+<script>
+  DashboardShell.init({ page: 'taxas', title: 'Taxas', subtitle: 'Tarifas e planos da sua conta' });
+</script>
+</body>
+</html>

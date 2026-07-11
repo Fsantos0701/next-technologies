@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APIs — Next Technologies</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230B1229%22/><path d=%22M28 70V30h9l26 27V30h9v40h-9L37 43v27z%22 fill=%22%2300E0C6%22/></svg>">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<div class="bg-fx" aria-hidden="true"></div>
+<div class="dash-layout">
+  <aside class="dash-sidebar" id="dashSidebar"></aside>
+  <div class="dash-content">
+    <header class="dash-topbar" id="dashTopbar"></header>
+    <div class="dpage-content">
+      <div class="dpanel">
+        <div class="dpanel-head"><span>Chave de API</span></div>
+        <span class="dpanel-note">Use essa chave para autenticar chamadas à API da Next Technologies.</span>
+
+        <div id="noKeyState" style="display:none;margin-top:16px;">
+          <span class="dform-msg" style="color:var(--text-muted);">Nenhuma chave gerada ainda.</span>
+        </div>
+
+        <div id="keyState" style="display:none;">
+          <div class="api-key-row">
+            <span class="api-key-value" id="apiKeyValue"></span>
+            <div class="api-key-actions">
+              <button class="dash-icon-btn" id="toggleKeyBtn" type="button" aria-label="Mostrar chave">
+                <svg class="icon"><use href="#icon-eye"></use></svg>
+              </button>
+              <button class="dash-icon-btn" id="copyKeyBtn" type="button" aria-label="Copiar chave">
+                <svg class="icon"><use href="#icon-copy"></use></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <span class="dform-msg" id="apiMsg"></span>
+
+        <div style="display:flex;gap:10px;margin-top:18px;">
+          <button class="btn btn-primary btn-sm" id="generateBtn" type="button">
+            <svg class="icon"><use href="#icon-refresh"></use></svg>
+            <span id="generateBtnLabel">Gerar chave</span>
+          </button>
+          <button class="btn btn-outline btn-sm" id="revokeBtn" type="button" style="display:none;">
+            <svg class="icon"><use href="#icon-trash"></use></svg>
+            Revogar chave
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="dashboard-shell.js"></script>
+<script>
+  let fullApiKey = null;
+  let keyVisible = false;
+
+  function maskKey(key) {
+    if (!key) return '';
+    return key.slice(0, 12) + '••••••••••••••••' + key.slice(-4);
+  }
+
+  function renderKey() {
+    const noKeyState = document.getElementById('noKeyState');
+    const keyState = document.getElementById('keyState');
+    const revokeBtn = document.getElementById('revokeBtn');
+    const generateBtnLabel = document.getElementById('generateBtnLabel');
+
+    if (!fullApiKey) {
+      noKeyState.style.display = 'block';
+      keyState.style.display = 'none';
+      revokeBtn.style.display = 'none';
+      generateBtnLabel.textContent = 'Gerar chave';
+      return;
+    }
+    noKeyState.style.display = 'none';
+    keyState.style.display = 'block';
+    revokeBtn.style.display = 'inline-flex';
+    generateBtnLabel.textContent = 'Gerar nova chave';
+    document.getElementById('apiKeyValue').textContent = keyVisible ? fullApiKey : maskKey(fullApiKey);
+  }
+
+  DashboardShell.init({ page: 'apis', title: 'APIs', subtitle: 'Chaves de acesso à API' }).then((user) => {
+    if (!user) return;
+    fullApiKey = user.apiKey;
+    renderKey();
+  });
+
+  document.getElementById('toggleKeyBtn').addEventListener('click', () => {
+    keyVisible = !keyVisible;
+    renderKey();
+  });
+
+  document.getElementById('copyKeyBtn').addEventListener('click', async () => {
+    const apiMsg = document.getElementById('apiMsg');
+    try {
+      await navigator.clipboard.writeText(fullApiKey);
+      apiMsg.className = 'dform-msg is-success';
+      apiMsg.textContent = 'Chave copiada.';
+    } catch (err) {
+      apiMsg.className = 'dform-msg is-error';
+      apiMsg.textContent = 'Não foi possível copiar automaticamente.';
+    }
+  });
+
+  document.getElementById('generateBtn').addEventListener('click', async () => {
+    const apiMsg = document.getElementById('apiMsg');
+    apiMsg.className = 'dform-msg';
+    apiMsg.textContent = '';
+    try {
+      const res = await fetch('/api/account/api-key/generate', { method: 'POST' });
+      const body = await res.json();
+      if (!res.ok) { apiMsg.className = 'dform-msg is-error'; apiMsg.textContent = body.error || 'Algo deu errado.'; return; }
+      fullApiKey = body.apiKey;
+      keyVisible = true;
+      renderKey();
+      apiMsg.className = 'dform-msg is-success';
+      apiMsg.textContent = 'Nova chave gerada com sucesso.';
+    } catch (err) {
+      apiMsg.className = 'dform-msg is-error';
+      apiMsg.textContent = 'Não foi possível conectar ao servidor.';
+    }
+  });
+
+  document.getElementById('revokeBtn').addEventListener('click', async () => {
+    const apiMsg = document.getElementById('apiMsg');
+    apiMsg.className = 'dform-msg';
+    apiMsg.textContent = '';
+    try {
+      const res = await fetch('/api/account/api-key/revoke', { method: 'POST' });
+      const body = await res.json();
+      if (!res.ok) { apiMsg.className = 'dform-msg is-error'; apiMsg.textContent = body.error || 'Algo deu errado.'; return; }
+      fullApiKey = null;
+      keyVisible = false;
+      renderKey();
+      apiMsg.className = 'dform-msg is-success';
+      apiMsg.textContent = 'Chave revogada.';
+    } catch (err) {
+      apiMsg.className = 'dform-msg is-error';
+      apiMsg.textContent = 'Não foi possível conectar ao servidor.';
+    }
+  });
+</script>
+</body>
+</html>

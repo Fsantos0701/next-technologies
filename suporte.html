@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suporte — Next Technologies</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230B1229%22/><path d=%22M28 70V30h9l26 27V30h9v40h-9L37 43v27z%22 fill=%22%2300E0C6%22/></svg>">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<div class="bg-fx" aria-hidden="true"></div>
+<div class="dash-layout">
+  <aside class="dash-sidebar" id="dashSidebar"></aside>
+  <div class="dash-content">
+    <header class="dash-topbar" id="dashTopbar"></header>
+    <div class="dpage-content">
+      <div class="dpanel">
+        <div class="dpanel-head"><span>Fale com o suporte</span></div>
+        <p class="dpanel-note" style="margin-top:8px;">Sua mensagem é enviada direto para a nossa equipe — respondemos em até 1 dia útil.</p>
+        <form id="supportForm" class="dform">
+          <label>
+            Seu e-mail
+            <input type="email" id="supportEmail" disabled>
+          </label>
+          <label>
+            Assunto
+            <input type="text" name="subject" id="subjectInput" placeholder="Ex: Dúvida sobre antecipação" required>
+          </label>
+          <label>
+            Mensagem
+            <textarea name="message" id="messageInput" placeholder="Descreva sua dúvida ou problema..." required></textarea>
+          </label>
+          <span class="dform-msg" id="supportMsg"></span>
+          <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-start;">Enviar mensagem</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="dashboard-shell.js"></script>
+<script>
+  let currentUserEmail = '';
+  DashboardShell.init({ page: 'suporte', title: 'Suporte', subtitle: 'Fale com nossa equipe' }).then((user) => {
+    if (!user) return;
+    currentUserEmail = user.email;
+    document.getElementById('supportEmail').value = user.email;
+  });
+
+  const supportForm = document.getElementById('supportForm');
+  const supportMsg = document.getElementById('supportMsg');
+  supportForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    supportMsg.className = 'dform-msg';
+    supportMsg.textContent = '';
+    const subject = document.getElementById('subjectInput').value;
+    const message = document.getElementById('messageInput').value;
+    const btn = supportForm.querySelector('button');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+    try {
+      const res = await fetch('/api/support', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, message }),
+      });
+      const body = await res.json();
+      if (!res.ok) { supportMsg.className = 'dform-msg is-error'; supportMsg.textContent = body.error || 'Algo deu errado.'; return; }
+      supportMsg.className = 'dform-msg is-success';
+      supportMsg.textContent = body.devMode
+        ? 'Mensagem registrada (modo de teste — sem chave de e-mail configurada).'
+        : 'Mensagem enviada com sucesso! Responderemos em breve.';
+      supportForm.reset();
+      document.getElementById('supportEmail').value = currentUserEmail;
+    } catch (err) {
+      supportMsg.className = 'dform-msg is-error';
+      supportMsg.textContent = 'Não foi possível conectar ao servidor.';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Enviar mensagem';
+    }
+  });
+</script>
+</body>
+</html>

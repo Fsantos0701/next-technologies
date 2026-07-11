@@ -1,12 +1,13 @@
 require('dotenv').config();
 const path = require('path');
+const crypto = require('crypto');
 const express = require('express');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
-const { findByEmail, findById, createUser, updatePassword } = require('./lib/userStore');
+const { findByEmail, findById, createUser, updatePassword, updateName, setApiKey } = require('./lib/userStore');
 const { createPending, getPending, deletePending } = require('./lib/pendingSignups');
 const { createPendingReset, getPendingReset, deletePendingReset } = require('./lib/pendingResets');
-const { sendVerificationEmail, sendResetCodeEmail } = require('./lib/mailer');
+const { sendVerificationEmail, sendResetCodeEmail, sendSupportEmail } = require('./lib/mailer');
 
 const PORT = process.env.PORT || 8082;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
@@ -137,11 +138,71 @@ app.get('/api/me', async (req, res) => {
   if (!req.session.userId) return res.status(401).json({ error: 'Não autenticado.' });
   const user = await findById(req.session.userId);
   if (!user) return res.status(401).json({ error: 'Não autenticado.' });
-  res.json({ user: { name: user.name, email: user.email } });
+  res.json({ user: { name: user.name, email: user.email, apiKey: user.apiKey || null } });
+});
+
+// ---------- Conta ----------
+app.post('/api/account/name', async (req, res) => {
+  if (!req.session.userId) return res.status(401).json({ error: 'Não autenticado.' });
+  const { name } = req.body || {};
+  if (!name || !name.trim()) return res.status(400).json({ error: 'Informe um nome válido.' });
+
+  const user = await updateName(req.session.userId, name.trim());
+  res.json({ ok: true, user: { name: user.name, email: user.email } });
+});
+
+app.post('/api/account/password', async (req, res) => {
+  if (!req.session.userId) return res.status(401).json({ error: 'Não autenticado.' });
+  const { currentPassword, newPassword } = req.body || {};
+  if (!newPassword || newPassword.length < 6) return res.status(400).json({ error: 'A nova senha precisa ter pelo menos 6 caracteres.' });
+
+  const user = await findById(req.session.userId);
+  if (!user) return res.status(401).json({ error: 'Não autenticado.' });
+
+  const match = await bcrypt.compare(currentPassword || '', user.passwordHash);
+  if (!match) return res.status(401).json({ error: 'Senha atual incorreta.' });
+
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  await updatePassword(user.email, passwordHash);
+  res.json({ ok: true });
+});
+
+app.post('/api/account/api-key/generate', async (req, res) => {
+  if (!req.session.userId) return res.status(401).json({ error: 'Não autenticado.' });
+  const apiKey = 'ntk_live_' + crypto.randomBytes(24).toString('hex');
+  await setApiKey(req.session.userId, apiKey);
+  res.json({ ok: true, apiKey });
+});
+
+app.post('/api/account/api-key/revoke', async (req, res) => {
+  if (!req.session.userId) return res.status(401).json({ error: 'Não autenticado.' });
+  await setApiKey(req.session.userId, null);
+  res.json({ ok: true });
+});
+
+app.post('/api/support', async (req, res) => {
+  if (!req.session.userId) return res.status(401).json({ error: 'Não autenticado.' });
+  const { subject, message } = req.body || {};
+  if (!subject || !subject.trim()) return res.status(400).json({ error: 'Informe um assunto.' });
+  if (!message || !message.trim()) return res.status(400).json({ error: 'Informe uma mensagem.' });
+
+  const user = await findById(req.session.userId);
+  try {
+    const result = await sendSupportEmail({ name: user.name, email: user.email, subject: subject.trim(), message: message.trim() });
+    res.json({ ok: true, devMode: !!result.devMode });
+  } catch (err) {
+    res.status(502).json({ error: 'Não foi possível enviar sua mensagem. Tente novamente.' });
+  }
 });
 
 // ---------- Páginas protegidas ----------
-app.get('/dashboard.html', (req, res, next) => {
+const PROTECTED_PAGES = [
+  '/dashboard.html', '/vendas.html', '/transacoes.html', '/contestacoes.html',
+  '/recuperacao.html', '/taxas.html', '/saques.html', '/integracoes.html',
+  '/apis.html', '/webhooks.html', '/emails.html', '/relatorios.html',
+  '/configuracoes.html', '/suporte.html',
+];
+app.get(PROTECTED_PAGES, (req, res, next) => {
   if (!req.session.userId) return res.redirect('/login.html');
   next();
 });

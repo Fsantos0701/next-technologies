@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contestações — Next Technologies</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230B1229%22/><path d=%22M28 70V30h9l26 27V30h9v40h-9L37 43v27z%22 fill=%22%2300E0C6%22/></svg>">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<div class="bg-fx" aria-hidden="true"></div>
+<div class="dash-layout">
+  <aside class="dash-sidebar" id="dashSidebar"></aside>
+  <div class="dash-content">
+    <header class="dash-topbar" id="dashTopbar"></header>
+    <div class="dpage-content">
+      <div class="dpanel">
+        <div class="dempty-state">
+          <svg class="icon"><use href="#icon-alert"></use></svg>
+          <p>Nenhuma contestação em aberto</p>
+          <span>Chargebacks e disputas abertas por clientes aparecem aqui, caso ocorram.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="dashboard-shell.js"></script>
+<script>
+  DashboardShell.init({ page: 'contestacoes', title: 'Contestações', subtitle: 'Chargebacks e disputas de clientes' });
+</script>
+</body>
+</html>
