@@ -23,6 +23,8 @@
 }
 .auth-switch{text-align:center;margin-top:22px;color:var(--text-muted);font-size:0.88rem;}
 .auth-switch a{color:var(--accent);font-weight:600;}
+.auth-forgot{align-self:flex-end;margin-top:-6px;font-size:0.82rem;color:var(--text-muted);}
+.auth-forgot:hover{color:var(--accent);}
 #codeInput{letter-spacing:8px;font-size:1.3rem;font-weight:700;text-align:center;}
 
 /* dashboard */

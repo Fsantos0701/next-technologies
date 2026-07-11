@@ -3,20 +3,23 @@ const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
-const { findByEmail, createUser } = require('./lib/userStore');
+const { findByEmail, createUser, updatePassword } = require('./lib/userStore');
 const { createPending, getPending, deletePending } = require('./lib/pendingSignups');
-const { sendVerificationEmail } = require('./lib/mailer');
+const { createPendingReset, getPendingReset, deletePendingReset } = require('./lib/pendingResets');
+const { sendVerificationEmail, sendResetCodeEmail } = require('./lib/mailer');
 
-const PORT = 8082;
+const PORT = process.env.PORT || 8082;
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const app = express();
 
+app.set('trust proxy', 1);
 app.use(express.json());
 app.use(session({
   name: 'next.sid',
-  secret: 'next-technologies-dev-secret-change-in-production',
+  secret: process.env.SESSION_SECRET || 'next-technologies-dev-secret-change-in-production',
   resave: false,
   saveUninitialized: false,
-  cookie: { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7 },
+  cookie: { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'lax', maxAge: 1000 * 60 * 60 * 24 * 7 },
 }));
 
 function isValidEmail(email) {
@@ -76,6 +79,41 @@ app.post('/api/signup/resend-code', async (req, res) => {
   } catch (err) {
     res.status(502).json({ error: 'Não foi possível reenviar o e-mail. Tente novamente.' });
   }
+});
+
+// Passo 1: se o e-mail existir, envia um código de redefinição.
+// Sempre responde ok para não revelar se o e-mail está cadastrado.
+app.post('/api/forgot-password', async (req, res) => {
+  const { email } = req.body || {};
+  if (!isValidEmail(email)) return res.status(400).json({ error: 'Informe um e-mail válido.' });
+
+  const user = findByEmail(email);
+  if (!user) return res.json({ ok: true });
+
+  const code = createPendingReset(email);
+  try {
+    const result = await sendResetCodeEmail(email, code);
+    res.json({ ok: true, devMode: !!result.devMode });
+  } catch (err) {
+    res.status(502).json({ error: 'Não foi possível enviar o e-mail. Tente novamente.' });
+  }
+});
+
+// Passo 2: confirma o código e define a nova senha.
+app.post('/api/reset-password', async (req, res) => {
+  const { email, code, newPassword } = req.body || {};
+  if (!isValidEmail(email) || !code) return res.status(400).json({ error: 'Informe o código recebido por e-mail.' });
+  if (!newPassword || newPassword.length < 6) return res.status(400).json({ error: 'A senha precisa ter pelo menos 6 caracteres.' });
+
+  const entry = getPendingReset(email);
+  if (!entry) return res.status(400).json({ error: 'Código expirado. Solicite novamente.' });
+  if (entry.code !== String(code).trim()) return res.status(400).json({ error: 'Código incorreto.' });
+
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  updatePassword(email, passwordHash);
+  deletePendingReset(email);
+
+  res.json({ ok: true });
 });
 
 app.post('/api/login', async (req, res) => {

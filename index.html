@@ -102,11 +102,12 @@
           <div class="panel-head">
             <span class="panel-dot red"></span><span class="panel-dot yellow"></span><span class="panel-dot green"></span>
             <span class="panel-title">Painel Next Technologies</span>
+            <span class="panel-live"><span class="live-dot"></span>Ao vivo</span>
           </div>
           <div class="panel-stats">
             <div class="stat-box">
               <span class="stat-label">Volume processado (30d)</span>
-              <span class="stat-value">R$ 1.284.930</span>
+              <span class="stat-value">R$ 2.847.650</span>
               <span class="stat-up"><svg class="icon"><use href="#icon-trending-up"></use></svg>18,4%</span>
             </div>
             <div class="stat-box">
@@ -114,28 +115,68 @@
               <span class="stat-value">96,7%</span>
               <span class="stat-up"><svg class="icon"><use href="#icon-trending-up"></use></svg>3,1%</span>
             </div>
+            <div class="stat-box">
+              <span class="stat-label">Ticket médio</span>
+              <span class="stat-value">R$ 187,40</span>
+              <span class="stat-up"><svg class="icon"><use href="#icon-trending-up"></use></svg>5,2%</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Uptime da infraestrutura</span>
+              <span class="stat-value">99,98%</span>
+              <span class="stat-up"><svg class="icon"><use href="#icon-shield-check"></use></svg>Certificado PCI DSS</span>
+            </div>
           </div>
           <div class="panel-chart" aria-hidden="true">
+            <div class="panel-chart-head">
+              <span>Volume de vendas</span>
+              <span class="panel-chart-period">Últimos 30 dias</span>
+            </div>
             <svg viewBox="0 0 300 90" preserveAspectRatio="none">
-              <polyline points="0,70 30,60 60,65 90,45 120,50 150,30 180,35 210,20 240,25 270,10 300,15" fill="none" stroke="url(#chartGrad)" stroke-width="3"/>
+              <line x1="0" y1="15" x2="300" y2="15" class="chart-grid"/>
+              <line x1="0" y1="45" x2="300" y2="45" class="chart-grid"/>
+              <line x1="0" y1="75" x2="300" y2="75" class="chart-grid"/>
+              <polygon points="0,70 30,60 60,65 90,45 120,50 150,30 180,35 210,20 240,25 270,10 300,15 300,90 0,90" fill="url(#areaGrad)" stroke="none"/>
+              <polyline points="0,70 30,60 60,65 90,45 120,50 150,30 180,35 210,20 240,25 270,10 300,15" fill="none" stroke="url(#chartGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="300" cy="15" r="4.5" class="chart-dot-pulse"/>
+              <circle cx="300" cy="15" r="3" fill="#00E0C6" stroke="#0F1A34" stroke-width="1.5"/>
               <defs>
                 <linearGradient id="chartGrad" x1="0" y1="0" x2="300" y2="0">
                   <stop stop-color="#00E0C6"/>
                   <stop offset="1" stop-color="#2F6BFF"/>
                 </linearGradient>
+                <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="90" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#00E0C6" stop-opacity="0.28"/>
+                  <stop offset="1" stop-color="#00E0C6" stop-opacity="0"/>
+                </linearGradient>
               </defs>
             </svg>
           </div>
           <div class="panel-tx">
-            <div class="tx-row">
+            <span class="panel-tx-head">Últimas transações</span>
+            <div class="tx-row" style="animation-delay:0s">
               <span class="tx-icon ok"><svg class="icon"><use href="#icon-check"></use></svg></span>
               <div class="tx-info"><strong>Pix aprovado</strong><small>Cliente ****2841 · agora</small></div>
               <span class="tx-amount">+ R$ 349,90</span>
             </div>
-            <div class="tx-row">
+            <div class="tx-row" style="animation-delay:0.15s">
               <span class="tx-icon ok"><svg class="icon"><use href="#icon-check"></use></svg></span>
-              <div class="tx-info"><strong>Cartão aprovado · 3x</strong><small>Cliente ****7710 · há 2 min</small></div>
+              <div class="tx-info"><strong>Pix aprovado</strong><small>Cliente ****5390 · agora</small></div>
+              <span class="tx-amount">+ R$ 129,00</span>
+            </div>
+            <div class="tx-row" style="animation-delay:0.3s">
+              <span class="tx-icon ok"><svg class="icon"><use href="#icon-check"></use></svg></span>
+              <div class="tx-info"><strong>Cartão aprovado · 3x</strong><small>Cliente ****7710 · há 1 min</small></div>
               <span class="tx-amount">+ R$ 897,00</span>
+            </div>
+            <div class="tx-row" style="animation-delay:0.45s">
+              <span class="tx-icon ok"><svg class="icon"><use href="#icon-check"></use></svg></span>
+              <div class="tx-info"><strong>Pix aprovado</strong><small>Cliente ****3018 · há 2 min</small></div>
+              <span class="tx-amount">+ R$ 1.240,00</span>
+            </div>
+            <div class="tx-row" style="animation-delay:0.6s">
+              <span class="tx-icon ok"><svg class="icon"><use href="#icon-check"></use></svg></span>
+              <div class="tx-info"><strong>Cartão aprovado · 1x</strong><small>Cliente ****9924 · há 3 min</small></div>
+              <span class="tx-amount">+ R$ 458,50</span>
             </div>
           </div>
         </div>
