@@ -101,6 +101,8 @@
   const backLink = document.getElementById('backLink');
 
   let pendingEmail = '';
+  let pendingName = '';
+  let pendingPassword = '';
 
   function showDevNote(devMode) {
     if (devMode) {
@@ -130,6 +132,8 @@
       if (!res.ok) { formError.textContent = body.error || 'Algo deu errado.'; return; }
 
       pendingEmail = data.email;
+      pendingName = data.name;
+      pendingPassword = data.password;
       codeEmailLabel.textContent = pendingEmail;
       showDevNote(body.devMode);
       stepForm.style.display = 'none';
@@ -172,19 +176,37 @@
   resendLink.addEventListener('click', async (e) => {
     e.preventDefault();
     codeError.textContent = '';
+    codeError.style.color = '';
+    resendLink.textContent = 'Reenviando...';
+
     try {
-      const res = await fetch('/api/signup/resend-code', {
+      let res = await fetch('/api/signup/resend-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: pendingEmail }),
       });
-      const body = await res.json();
+      let body = await res.json();
+
+      // Cadastro pendente expirou (passou de 10 min) — recria do zero, sem pedir pra voltar.
+      if (!res.ok && pendingName && pendingPassword) {
+        res = await fetch('/api/signup/request-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: pendingName, email: pendingEmail, password: pendingPassword }),
+        });
+        body = await res.json();
+      }
+
       if (!res.ok) { codeError.textContent = body.error || 'Não foi possível reenviar.'; return; }
       showDevNote(body.devMode);
       codeError.textContent = 'Novo código enviado.';
       codeError.style.color = 'var(--accent)';
+      document.getElementById('codeInput').value = '';
+      document.getElementById('codeInput').focus();
     } catch (err) {
       codeError.textContent = 'Não foi possível conectar ao servidor.';
+    } finally {
+      resendLink.textContent = 'Reenviar código';
     }
   });
 
