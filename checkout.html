@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assinar plano — Next Technologies</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230B1229%22/><path d=%22M28 70V30h9l26 27V30h9v40h-9L37 43v27z%22 fill=%22%2300E0C6%22/></svg>">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<div class="bg-fx" aria-hidden="true"></div>
+
+<div class="auth-page">
+  <a href="/" class="logo auth-logo">
+    <svg width="34" height="34" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100" height="100" rx="22" fill="url(#logoGrad)"/>
+      <path d="M28 70V30h9l26 27V30h9v40h-9L37 43v27z" fill="#061024"/>
+      <defs>
+        <linearGradient id="logoGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#00E0C6"/><stop offset="1" stop-color="#2F6BFF"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <span class="logo-word">NEXT <b>TECHNOLOGIES</b></span>
+  </a>
+
+  <div class="checkout-card">
+    <aside class="checkout-summary">
+      <span class="kicker">Você está assinando</span>
+      <h2 id="sumPlanName">Plano</h2>
+      <p class="plan-desc" id="sumPlanDesc"></p>
+      <div class="checkout-price">
+        <span class="amount" id="sumPlanPrice">R$ 0</span>
+        <span class="period" id="sumPlanPeriod">/mês</span>
+      </div>
+      <ul class="checkout-features" id="sumPlanFeatures"></ul>
+      <div class="checkout-secure">
+        <svg class="icon"><use href="#icon-lock"></use></svg>
+        Pagamento simulado — ambiente de demonstração
+      </div>
+    </aside>
+
+    <div class="checkout-form-wrap">
+      <div class="checkout-steps">
+        <span class="checkout-step-dot" id="dot1"></span>
+        <span class="checkout-step-dot" id="dot2"></span>
+        <span class="checkout-step-dot" id="dot3"></span>
+      </div>
+
+      <!-- Etapa 1: dados -->
+      <div id="stepBilling">
+        <h3>Seus dados</h3>
+        <form id="billingForm" class="dform" style="max-width:none;">
+          <label>
+            Nome completo
+            <input type="text" name="name" id="billingName" required autocomplete="name">
+          </label>
+          <label>
+            E-mail
+            <input type="email" name="email" id="billingEmail" required autocomplete="email">
+          </label>
+          <label>
+            CPF ou CNPJ
+            <input type="text" name="document" id="billingDocument" required placeholder="000.000.000-00" autocomplete="off">
+          </label>
+          <span class="dform-msg" id="billingMsg"></span>
+          <button type="submit" class="btn btn-primary btn-block btn-lg" id="billingSubmitBtn">Continuar</button>
+        </form>
+      </div>
+
+      <!-- Etapa 2: pagamento (planos pagos) -->
+      <div id="stepPayment" style="display:none;">
+        <h3>Forma de pagamento</h3>
+        <div class="payment-tabs">
+          <button type="button" class="payment-tab is-active" data-method="card">
+            <svg class="icon"><use href="#icon-card"></use></svg>Cartão de crédito
+          </button>
+          <button type="button" class="payment-tab" data-method="pix">
+            <svg class="icon"><use href="#icon-qr"></use></svg>Pix
+          </button>
+        </div>
+
+        <form id="cardForm" class="dform" style="max-width:none;">
+          <label>
+            Número do cartão
+            <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" inputmode="numeric" maxlength="19" required>
+          </label>
+          <div class="card-row">
+            <label>
+              Validade
+              <input type="text" id="cardExpiry" placeholder="MM/AA" inputmode="numeric" maxlength="5" required>
+            </label>
+            <label>
+              CVV
+              <input type="text" id="cardCvv" placeholder="123" inputmode="numeric" maxlength="4" required>
+            </label>
+          </div>
+          <label>
+            Nome impresso no cartão
+            <input type="text" id="cardName" placeholder="Como está no cartão" required>
+          </label>
+        </form>
+
+        <div id="pixPanel" style="display:none;">
+          <div class="pix-box">
+            <div class="qr-placeholder" aria-hidden="true"></div>
+            <span style="font-size:0.84rem;color:var(--text-muted);">Escaneie o QR Code no app do seu banco</span>
+            <div class="pix-code-row">
+              <input type="text" id="pixCode" readonly value="00020126580014BR.GOV.BCB.PIX0136next-technologies-demo-5204000053039865802BR5913NEXT TECH LTDA6009SAOPAULO62070503***6304ABCD">
+              <button type="button" class="btn btn-outline btn-sm" id="copyPixBtn">Copiar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="checkout-total">
+          <span style="color:var(--text-muted);font-size:0.85rem;">Total hoje</span>
+          <b id="totalAmount">R$ 0</b>
+        </div>
+
+        <span class="dform-msg" id="paymentMsg"></span>
+        <button type="button" class="btn btn-primary btn-block btn-lg" id="finishBtn" style="margin-top:18px;">Finalizar assinatura</button>
+      </div>
+
+      <!-- Etapa 3: processando -->
+      <div id="stepProcessing" style="display:none;">
+        <div class="checkout-processing">
+          <div class="checkout-spinner"></div>
+          <p style="color:var(--text-muted);font-size:0.9rem;">Processando pagamento...</p>
+        </div>
+      </div>
+
+      <!-- Etapa 4: sucesso -->
+      <div id="stepSuccess" style="display:none;">
+        <div class="checkout-success">
+          <div class="checkout-success-icon"><svg class="icon"><use href="#icon-check"></use></svg></div>
+          <h3>Assinatura confirmada!</h3>
+          <p id="successText">Seu plano já está ativo. Crie sua conta para acessar o painel.</p>
+          <a href="/signup.html" class="btn btn-primary btn-lg" style="margin-top:18px;">Criar minha conta</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="auth-switch"><a href="/#planos">← Voltar para os planos</a></p>
+</div>
+
+<svg class="icon-sprite" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="icon-lock" viewBox="0 0 24 24"><path d="M6 11V8a6 6 0 0 1 12 0v3"/><rect x="4" y="11" width="16" height="10" rx="2"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></symbol>
+    <symbol id="icon-card" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></symbol>
+    <symbol id="icon-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><line x1="14" y1="14" x2="14" y2="21"/><line x1="21" y1="14" x2="21" y2="21"/><line x1="17.5" y1="14" x2="17.5" y2="17.5"/><line x1="14" y1="17.5" x2="21" y2="17.5"/></symbol>
+  </defs>
+</svg>
+
+<script>
+  const PLANS = {
+    essencial: {
+      name: 'Essencial',
+      desc: 'Para quem está começando a vender online.',
+      price: 0,
+      priceLabel: 'Grátis',
+      period: '',
+      features: ['Checkout transparente', 'Dashboard completo', 'Suporte por chat', '1,79% por Pix · 5,3% por cartão'],
+    },
+    pro: {
+      name: 'Pro',
+      desc: 'Para negócios em crescimento acelerado.',
+      price: 99,
+      priceLabel: 'R$ 99',
+      period: '/mês',
+      features: ['Tudo do Essencial', 'Antecipação de recebíveis', 'Split automático', 'Gerente de conta', '1,5% por Pix · 4,7% por cartão'],
+    },
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const planKey = PLANS[params.get('plan')] ? params.get('plan') : 'essencial';
+  const plan = PLANS[planKey];
+  const isPaid = plan.price > 0;
+
+  document.getElementById('sumPlanName').textContent = plan.name;
+  document.getElementById('sumPlanDesc').textContent = plan.desc;
+  document.getElementById('sumPlanPrice').textContent = plan.priceLabel;
+  document.getElementById('sumPlanPeriod').textContent = plan.period;
+  document.getElementById('sumPlanFeatures').innerHTML = plan.features
+    .map((f) => '<li><svg class="icon"><use href="#icon-check"></use></svg>' + f + '</li>')
+    .join('');
+  document.getElementById('totalAmount').textContent = isPaid ? plan.priceLabel + plan.period : 'R$ 0';
+
+  const dots = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3')];
+  function setStep(n) {
+    dots.forEach((d, i) => {
+      d.classList.toggle('is-done', i < n - 1);
+      d.classList.toggle('is-active', i === n - 1);
+    });
+  }
+  setStep(1);
+
+  const stepBilling = document.getElementById('stepBilling');
+  const stepPayment = document.getElementById('stepPayment');
+  const stepProcessing = document.getElementById('stepProcessing');
+  const stepSuccess = document.getElementById('stepSuccess');
+
+  // formatação dos campos de cartão
+  const cardNumber = document.getElementById('cardNumber');
+  cardNumber.addEventListener('input', () => {
+    cardNumber.value = cardNumber.value.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
+  });
+  const cardExpiry = document.getElementById('cardExpiry');
+  cardExpiry.addEventListener('input', () => {
+    let v = cardExpiry.value.replace(/\D/g, '').slice(0, 4);
+    if (v.length > 2) v = v.slice(0, 2) + '/' + v.slice(2);
+    cardExpiry.value = v;
+  });
+  const cardCvv = document.getElementById('cardCvv');
+  cardCvv.addEventListener('input', () => {
+    cardCvv.value = cardCvv.value.replace(/\D/g, '').slice(0, 4);
+  });
+  const billingDocument = document.getElementById('billingDocument');
+  billingDocument.addEventListener('input', () => {
+    const digits = billingDocument.value.replace(/\D/g, '').slice(0, 14);
+    if (digits.length <= 11) {
+      billingDocument.value = digits
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    } else {
+      billingDocument.value = digits
+        .replace(/(\d{2})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1/$2')
+        .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+    }
+  });
+
+  document.getElementById('billingForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    stepBilling.style.display = 'none';
+
+    if (!isPaid) {
+      setStep(3);
+      document.getElementById('successText').textContent = 'Seu plano Essencial já está ativo, sem custo. Crie sua conta para acessar o painel.';
+      stepSuccess.style.display = 'block';
+      return;
+    }
+
+    setStep(2);
+    stepPayment.style.display = 'block';
+  });
+
+  document.querySelectorAll('.payment-tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.payment-tab').forEach((t) => t.classList.remove('is-active'));
+      tab.classList.add('is-active');
+      const isCard = tab.dataset.method === 'card';
+      document.getElementById('cardForm').style.display = isCard ? 'flex' : 'none';
+      document.getElementById('pixPanel').style.display = isCard ? 'none' : 'block';
+    });
+  });
+
+  document.getElementById('copyPixBtn').addEventListener('click', async () => {
+    const input = document.getElementById('pixCode');
+    try {
+      await navigator.clipboard.writeText(input.value);
+      const btn = document.getElementById('copyPixBtn');
+      const original = btn.textContent;
+      btn.textContent = 'Copiado!';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    } catch (err) {}
+  });
+
+  document.getElementById('finishBtn').addEventListener('click', () => {
+    const msg = document.getElementById('paymentMsg');
+    const cardActive = document.querySelector('.payment-tab.is-active').dataset.method === 'card';
+
+    if (cardActive) {
+      const form = document.getElementById('cardForm');
+      if (!form.reportValidity()) return;
+    }
+
+    msg.textContent = '';
+    stepPayment.style.display = 'none';
+    stepProcessing.style.display = 'block';
+
+    setTimeout(() => {
+      stepProcessing.style.display = 'none';
+      setStep(3);
+      document.getElementById('successText').textContent = 'Sua assinatura do plano ' + plan.name + ' foi confirmada. Crie sua conta para acessar o painel.';
+      stepSuccess.style.display = 'block';
+    }, 1800);
+  });
+</script>
+</body>
+</html>
