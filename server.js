@@ -4,6 +4,8 @@ const crypto = require('crypto');
 const express = require('express');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { findByEmail, findById, createUser, updatePassword, updateName, setApiKey, listUsers, setStatus, deleteUser } = require('./lib/userStore');
 const { createPending, getPending, deletePending } = require('./lib/pendingSignups');
 const { createPendingReset, getPendingReset, deletePendingReset } = require('./lib/pendingResets');
@@ -11,17 +13,56 @@ const { sendVerificationEmail, sendResetCodeEmail, sendSupportEmail } = require(
 
 const PORT = process.env.PORT || 8082;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+// Este repositório é público no GitHub — nunca use um segredo padrão aqui.
+// Se a variável de ambiente sumir em produção, o servidor recusa subir em vez de usar um valor previsível.
+if (IS_PRODUCTION && !process.env.SESSION_SECRET) {
+  throw new Error('SESSION_SECRET não configurada em produção. Defina a variável de ambiente antes de iniciar o servidor.');
+}
+const SESSION_SECRET = process.env.SESSION_SECRET || 'next-technologies-dev-secret-change-in-production';
+
 const app = express();
 
 app.set('trust proxy', 1);
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:'],
+      fontSrc: ["'self'", 'data:'],
+      connectSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'self'"],
+    },
+  },
+}));
 app.use(express.json());
 app.use(session({
   name: 'next.sid',
-  secret: process.env.SESSION_SECRET || 'next-technologies-dev-secret-change-in-production',
+  secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'lax', maxAge: 1000 * 60 * 60 * 24 * 7 },
 }));
+
+// Limita tentativas em rotas sensíveis — sem isso, senha e código de verificação
+// de 6 dígitos podem ser adivinhados por força bruta sem nenhum obstáculo.
+// Cada rota recebe sua própria instância — do contrário, rotas diferentes
+// compartilhariam a mesma cota e um usuário legítimo poderia ser bloqueado
+// em "esqueci minha senha" só por ter errado a senha de login antes.
+function makeLimiter(limit) {
+  return rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Muitas tentativas. Aguarde alguns minutos e tente novamente.' },
+  });
+}
 
 function isValidEmail(email) {
   return typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -47,12 +88,12 @@ async function requireAdmin(req, res, next) {
 
 // Passo 1: valida os dados, gera um código de 6 dígitos e envia por e-mail.
 // Nenhuma conta é criada ainda — os dados ficam pendentes até o código ser confirmado.
-app.post('/api/signup/request-code', async (req, res) => {
+app.post('/api/signup/request-code', makeLimiter(10), async (req, res) => {
   const { name, email, password } = req.body || {};
 
   if (!name || !name.trim()) return res.status(400).json({ error: 'Informe seu nome.' });
   if (!isValidEmail(email)) return res.status(400).json({ error: 'Informe um e-mail válido.' });
-  if (!password || password.length < 6) return res.status(400).json({ error: 'A senha precisa ter pelo menos 6 caracteres.' });
+  if (!password || password.length < 8) return res.status(400).json({ error: 'A senha precisa ter pelo menos 8 caracteres.' });
   if (await findByEmail(email)) return res.status(409).json({ error: 'Já existe uma conta com este e-mail.' });
 
   const passwordHash = await bcrypt.hash(password, 10);
@@ -68,7 +109,7 @@ app.post('/api/signup/request-code', async (req, res) => {
 });
 
 // Passo 2: confirma o código e só então cria a conta de verdade.
-app.post('/api/signup/verify-code', async (req, res) => {
+app.post('/api/signup/verify-code', makeLimiter(20), async (req, res) => {
   const { email, code } = req.body || {};
   if (!isValidEmail(email) || !code) return res.status(400).json({ error: 'Informe o código recebido por e-mail.' });
 
@@ -84,7 +125,7 @@ app.post('/api/signup/verify-code', async (req, res) => {
 });
 
 // Reenvia um novo código para um cadastro ainda pendente.
-app.post('/api/signup/resend-code', async (req, res) => {
+app.post('/api/signup/resend-code', makeLimiter(10), async (req, res) => {
   const { email } = req.body || {};
   const entry = getPending(email || '');
   if (!entry) return res.status(400).json({ error: 'Nenhum cadastro pendente para este e-mail.' });
@@ -100,7 +141,7 @@ app.post('/api/signup/resend-code', async (req, res) => {
 
 // Passo 1: se o e-mail existir, envia um código de redefinição.
 // Sempre responde ok para não revelar se o e-mail está cadastrado.
-app.post('/api/forgot-password', async (req, res) => {
+app.post('/api/forgot-password', makeLimiter(10), async (req, res) => {
   const { email } = req.body || {};
   if (!isValidEmail(email)) return res.status(400).json({ error: 'Informe um e-mail válido.' });
 
@@ -117,7 +158,7 @@ app.post('/api/forgot-password', async (req, res) => {
 });
 
 // Passo 2: confirma o código e define a nova senha.
-app.post('/api/reset-password', async (req, res) => {
+app.post('/api/reset-password', makeLimiter(20), async (req, res) => {
   const { email, code, newPassword } = req.body || {};
   if (!isValidEmail(email) || !code) return res.status(400).json({ error: 'Informe o código recebido por e-mail.' });
   if (!newPassword || newPassword.length < 6) return res.status(400).json({ error: 'A senha precisa ter pelo menos 6 caracteres.' });
@@ -133,7 +174,7 @@ app.post('/api/reset-password', async (req, res) => {
   res.json({ ok: true });
 });
 
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', makeLimiter(10), async (req, res) => {
   const { email, password } = req.body || {};
   const user = await findByEmail(email || '');
 
@@ -172,7 +213,7 @@ app.post('/api/account/name', async (req, res) => {
 app.post('/api/account/password', async (req, res) => {
   if (!req.session.userId) return res.status(401).json({ error: 'Não autenticado.' });
   const { currentPassword, newPassword } = req.body || {};
-  if (!newPassword || newPassword.length < 6) return res.status(400).json({ error: 'A nova senha precisa ter pelo menos 6 caracteres.' });
+  if (!newPassword || newPassword.length < 8) return res.status(400).json({ error: 'A nova senha precisa ter pelo menos 8 caracteres.' });
 
   const user = await findById(req.session.userId);
   if (!user) return res.status(401).json({ error: 'Não autenticado.' });
